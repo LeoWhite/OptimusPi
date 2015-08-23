@@ -7,9 +7,10 @@ of plastic piping to hold the motors. The brains is, of course, a Raspberry Pi
 (currently a Model A+) with an Arduino being used as a motor controller (Its
 responsibilities may be expanded upon later).
 
-Remote control of the robot was done via a Sony PlayStation 3 DualShock controller, 
+Remote control of the robot is planned to be  via a Sony PlayStation 3 DualShock controller, 
 connected via BlueTooth to the Raspberry Pi.
 
+Autonomous control will be dealt with by a variety of sensors.
 
 Installation
 ============
