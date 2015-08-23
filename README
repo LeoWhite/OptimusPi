@@ -1,0 +1,27 @@
+OptimusPi
+=========
+
+This is the source code that will be used for my PiWars 2015 entry 'OptimusPi'.
+Currently OptimusPi is a scratch built robot made from plywood and some pieces
+of plastic piping to hold the motors. The brains is, of course, a Raspberry Pi
+(currently a Model A+) with an Arduino being used as a motor controller (Its
+responsibilities may be expanded upon later).
+
+Remote control of the robot was done via a Sony PlayStation 3 DualShock controller, 
+connected via BlueTooth to the Raspberry Pi.
+
+
+Installation
+============
+
+
+Raspberry Pi
+===========
+ 
+ To-do
+ 
+Arduino
+=======
+
+ To-do
+ 
