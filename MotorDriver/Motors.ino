@@ -76,14 +76,14 @@ void Motors(int left, int right)
     digitalWrite(inb1pin, LOW);
   }
   else if(motors[LEFT_MOTOR].power >= 0) {
-    // Need to go 'forwards' so set to 'clockwise'
-    digitalWrite(ina1pin, HIGH);
-    digitalWrite(inb1pin, LOW);    
+    // Need to go 'forwards' so set to 'counter clockwise'
+    digitalWrite(ina1pin, LOW);
+    digitalWrite(inb1pin, HIGH);    
   }
   // Backwards!
   else {
-    digitalWrite(ina1pin, LOW);
-    digitalWrite(inb1pin, HIGH);    
+    digitalWrite(ina1pin, HIGH);
+    digitalWrite(inb1pin, LOW);
   }
   
   analogWrite (pwm1pin,lmspeed);                  // set left PWM to absolute value of left speed - if brake is engaged then PWM controls braking
