@@ -1,11 +1,12 @@
 #!/usr/bin/env python
  
 import pygame
-import smbus
 import time
 import os, sys, math
 from collections import namedtuple
 import struct
+
+import pigpio
 
 # Key mappings
 PS3_SELECT = 0
@@ -69,7 +70,7 @@ def sendMessage(cmd, message):
   finalMessage = newMessage + chr(CS)
   
   # Send the message  
-  bus.write_i2c_block_data(I2CAddress, finalMessage[0], finalMessage[1:len(finalMessage)-1])
+  pi.i2c_write_device(h, finalMessage)
   
 # reads a message back from the Arduino, vaidating
 # the checksum
@@ -77,9 +78,9 @@ def sendMessage(cmd, message):
 # length - The expected length of the message  
 def readMessage(length):
     # Read in data plus checksum
-    status = bus.read_i2c_block_data(I2CAddress, 0x00)
+    (count, status) = pi.i2c_read_device(h, length + 1)
     
-    if len(status) == (length + 1):
+    if count == (length + 1):
       CS = length;
       for i in range(0, length):
         CS = (CS & 0xFF ^ ord(status[i:i+1]) & 0xFF)
@@ -147,8 +148,9 @@ LeftTrack = 0
 RightTrack = 0
 PowerLimiter = POWER_LIMITER_DEFAULT
 
-# Configure smbs
-bus = smbus.SMBus(1)
+# Configure pigpio
+pi = pigpio.pi()
+h = pi.i2c_open(1, I2CAddress)
 
 try:
     # Only allow axis and button events
@@ -201,12 +203,10 @@ try:
             #print 'RightTrack %f' % RightTrack              
             setMotors(LeftTrack, RightTrack)  
               
-          if UpdateServo:
-            setServo(ServoPosition)
-            
         
         
 except KeyboardInterrupt:
     # Turn off the motors
     stop()
+    pi.stop()
     j.quit()
