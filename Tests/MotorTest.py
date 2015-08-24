@@ -95,8 +95,6 @@ def readMessage(length):
   
 # Stops the robot
 def stop():
-  global i2cConnect, i2cFD
-
   # We use a try/catch block in case there is an error reading or writing
   # to the i2c file handle
   try:
@@ -108,7 +106,7 @@ def stop():
       print "Failed to stop!"
   except:
     print "Failed to stop motors!"
-    i2cFD.flush()
+
 
     
 # Set the motor power to the specifiedvalues
@@ -116,8 +114,6 @@ def stop():
 # leftMotor - Power for left motor. -100 to 100
 # rightMotor - Power for right motor. -100 to 100
 def setMotors(leftMotor, rightMotor):
-  global i2cConnect, i2cFD
-  
   # We use a try/catch block in case there is an error reading or writing
   # to the i2c file handle
   try:
@@ -130,7 +126,6 @@ def setMotors(leftMotor, rightMotor):
       print "Failed to set motors!"
   except:
     print "Failed to set motors!"
-    i2cFD.flush()
     
 
 # Wait for a joystick to become available before running the
