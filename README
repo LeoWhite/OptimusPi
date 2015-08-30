@@ -19,7 +19,18 @@ Installation
 Raspberry Pi
 ===========
  
- To-do
+ - Flash SD Card with Raspbian NoX image (20150804-raspbian-wheezy-1-noX.zip)
+ - Expand file system, enable i2c and change device name to OptimusPi via raspi-config
+ - sudo apt-get update
+ - sudo apt-get upgrade
+ - Instal PiGPIO library (http://abyz.co.uk/rpi/pigpio/)
+ - Install i2c tools (sudo apt-get install i2c-tools)
+ - Add i2c-dev to /etc/modules
+ - Install GIT (sudo apt-get install git)
+ - Check out repository (git clone git@github.com:LeoWhite/OptimusPi.git)
+
+ Optional
+ - Install pygame for tests (sudo apt-get install python-pygame)
  
 Arduino
 =======
