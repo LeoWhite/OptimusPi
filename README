@@ -29,8 +29,13 @@ Raspberry Pi
  - Install GIT (sudo apt-get install git)
  - Check out repository (git clone git@github.com:LeoWhite/OptimusPi.git)
 
+ - Install support for PS3 controller (Article in https://www.raspberrypi.org/magpi-issues/MagPiSE1.pdf)
+
  Optional
  - Install pygame for tests (sudo apt-get install python-pygame)
+
+ Additional Hardware
+ - Lindy USB Bluetooth & HS WLAN 11n Combo Adapter
  
 Arduino
 =======
