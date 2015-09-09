@@ -40,5 +40,4 @@ Raspberry Pi
 Arduino
 =======
 
- To-do
- 
+ - Download and install the Pololu Dual VNH5019 Motor Driver library (https://github.com/pololu/dual-vnh5019-motor-shield/)

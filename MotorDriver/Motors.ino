@@ -1,4 +1,5 @@
-// This is setup for the Moto Monster Shield dual motor driver
+// This is setup for the Pololu Dual VNH5019 Motor Driver Shield
+// Library is available from https://github.com/pololu/dual-vnh5019-motor-shield
 
 // How long to disable the motors after an overload
 // has been 
@@ -10,15 +11,7 @@
 void motorsSetup() {
   //TCCR2B = TCCR2B & B11111000 | B00000110;   // set timer 2 divisor to  256 for PWM frequency of    122.070312500 Hz
   
-  // Setup the left motor
-  pinMode(pwm1pin,OUTPUT);
-  pinMode(ina1pin,OUTPUT);
-  pinMode(inb1pin,OUTPUT);
-  
-  // Setup the right motor
-  pinMode(pwm2pin,OUTPUT);
-  pinMode(ina2pin,OUTPUT);
-  pinMode(inb2pin,OUTPUT);
+  md.init();
   
   // Initialise the motor arrays
   memset(motors, 0, sizeof(motors));
@@ -62,62 +55,38 @@ void Motors(int left, int right)
   motors[RIGHT_MOTOR].power = right;
   
   // Convert from percentage to actual value
-  lmspeed = (abs(motors[LEFT_MOTOR].power) * 0xFF) / 100;
-  rmspeed = (abs(motors[RIGHT_MOTOR].power) * 0xFF) /100;
-  
-  // Convert to take into account the difference between
-  // the input voltage and the target output voltage
-  //lmspeed = (lmspeed * powerRatio) / 100;
-  //rmspeed = (rmspeed * powerRatio) / 100;
+  // The library uses a range of -400 to 400
+  lmspeed = (motors[LEFT_MOTOR].power * 400) / 100;
+  rmspeed = (motors[RIGHT_MOTOR].power * 400) /100;
   
   // Are we braking?
   if(motors[LEFT_MOTOR].brake) {
-    digitalWrite(ina1pin, LOW);
-    digitalWrite(inb1pin, LOW);
+    md.setM2Brake(200);
   }
-  else if(motors[LEFT_MOTOR].power >= 0) {
-    // Need to go 'forwards' so set to 'counter clockwise'
-    digitalWrite(ina1pin, LOW);
-    digitalWrite(inb1pin, HIGH);    
-  }
-  // Backwards!
   else {
-    digitalWrite(ina1pin, HIGH);
-    digitalWrite(inb1pin, LOW);
+    md.setM2Speed(-lmspeed);
   }
   
-  analogWrite (pwm1pin,lmspeed);                  // set left PWM to absolute value of left speed - if brake is engaged then PWM controls braking
-
   if(motors[LEFT_MOTOR].brake>0 && motors[LEFT_MOTOR].power==0) {
     motors[LEFT_MOTOR].encoderCount=0;                  // if left brake is enabled and left speed=0 then reset left encoder counter
   }
   
   // Are we braking?
   if(motors[RIGHT_MOTOR].brake) {
-    digitalWrite(ina2pin, LOW);
-    digitalWrite(inb2pin, LOW);
+    md.setM1Brake(200);
   }
-  else if(motors[RIGHT_MOTOR].power >= 0) {
-    // Need to go 'forwards' so set to 'clockwise'
-    digitalWrite(ina2pin, HIGH);
-    digitalWrite(inb2pin, LOW);    
-  }
-  // Backwards!
   else {
-    digitalWrite(ina2pin, LOW);
-    digitalWrite(inb2pin, HIGH);    
+    md.setM1Speed(rmspeed);
   }
-
-  analogWrite (pwm2pin,rmspeed);                  // set right PWM to absolute value of right speed - if brake is engaged then PWM controls braking
   
   if(motors[RIGHT_MOTOR].brake>0 && motors[RIGHT_MOTOR].power==0) {
     motors[RIGHT_MOTOR].encoderCount=0;                  // if left brake is enabled and left speed=0 then reset left encoder counter
   }  
 
 Serial.print("Motors =");
-  Serial.print(motors[LEFT_MOTOR].power);
+  Serial.print(lmspeed);
   Serial.print(":");
-  Serial.println(motors[RIGHT_MOTOR].power);
+  Serial.println(rmspeed);
   
 }
 

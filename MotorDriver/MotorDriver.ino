@@ -1,4 +1,5 @@
 #include "MotorDriver.h"
+#include "DualVNH5019MotorShield.h"
 #include <avr/wdt.h>
 
 
@@ -13,6 +14,8 @@
 
 // Array to hold details on the 2 motors this system has
 Motor motors[2];
+
+DualVNH5019MotorShield md;
 
 // Time we last detected an overloaded
 unsigned long lastOverloadMS = 0; 
@@ -48,8 +51,8 @@ void setup() {
  */
 void loop() {
   // Read in the current amps
-  //motors[LEFT_MOTOR].current=(analogRead(lmcurpin)-511)*48.83;
-  //motors[RIGHT_MOTOR].current=(analogRead(rmcurpin)-511)*48.83;  
+  motors[LEFT_MOTOR].current=md.getM1CurrentMilliamps();
+  motors[RIGHT_MOTOR].current=md.getM2CurrentMilliamps();
   
   // Check if we've gone over the limit
   if(motors[LEFT_MOTOR].current >= CURRENT_OVERLOAD_CUTOUT || motors[RIGHT_MOTOR].current >= CURRENT_OVERLOAD_CUTOUT) {
