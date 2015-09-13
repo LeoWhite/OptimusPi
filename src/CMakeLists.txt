@@ -3,10 +3,12 @@ project (OptimusPi)
 
 # We want all the 'bin' files to output into a specific directory
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # The version number
-set (OptimusPi_VERSION_MAJOR 1)
-set (OptimusPi_VERSION_MINOR 0)
+set (OptimusPi_VERSION_MAJOR 0)
+set (OptimusPi_VERSION_MINOR 1)
 
 # Configure header file to pass the CMake settings to the
 # source code
