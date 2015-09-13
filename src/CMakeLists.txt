@@ -18,6 +18,11 @@ configure_file (
 # Add the binary tree for the search path
 include_directories("${PROJECT_BINARY_DIR}")
 
+# The PiWars library
+include_directories("${PROJECT_SOURCE_DIR}/PiWars")
+add_subdirectory(PiWars)
+
 # The main executable
 add_executable(OptimusPi main.cpp)
+target_link_libraries(OptimusPi PiWars)
 
