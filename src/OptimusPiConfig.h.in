@@ -1,0 +1,4 @@
+// The configure options passed in from CMake
+#define OptimusPi_VERSION_MAJOR @OptimusPi_VERSION_MAJOR@
+#define OptimusPi_VERSION_MINOR @OptimusPi_VERSION_MINOR@
+
