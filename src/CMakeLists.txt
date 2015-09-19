@@ -6,6 +6,9 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+# We're going to be using C++11 features
+add_definitions(-std=c++11)
+
 # The version number
 set (OptimusPi_VERSION_MAJOR 0)
 set (OptimusPi_VERSION_MINOR 1)

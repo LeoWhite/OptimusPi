@@ -1,2 +1,2 @@
 # The PiWars library
-add_library(PiWars Brains.cpp)
+add_library(PiWars SHARED PiWars.cpp Brains.cpp)
