@@ -6,6 +6,6 @@ namespace PiWars
 
   PiWars::PiWars() : _brains(new Brains())
   {
-    
-  }  
+
+  }
 }
