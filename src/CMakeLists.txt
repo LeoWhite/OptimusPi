@@ -22,6 +22,8 @@ configure_file (
 
 # Add the binary tree for the search path
 include_directories("${PROJECT_BINARY_DIR}")
+include_directories("/usr/include/libevdev-1.0/libevdev/")
+
 
 # The PiWars library
 include_directories("${PROJECT_SOURCE_DIR}/PiWars")

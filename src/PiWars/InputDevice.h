@@ -3,6 +3,8 @@
  */
 #include <cstdint>
 #include <string>
+#include "linux/input.h"
+
 
 #include "libevdev.h"
 
@@ -29,21 +31,25 @@ namespace PiWars {
       uint8_t getType();
 
       // Returns the device name
-      std::string &getName();
+      std::string &getName() { return _name; }
 
-      // Returns the number of axis on this device
-      uint8_t getNumAxis();
+      // Returns the number of axes on this device
+      std::size_t getNumAxes() { return _numAxes; }
 
       // Returns the number of buttons on this device
-      uint8_t getNumButtons();
+      std::size_t getNumButtons() { return _numButtons; }
 
     private:
+      // Reads in, and cache, information about the input device
+      void populateInfo();
+      
       std::string _inputPath; //!< The file path of the input device
       int         _fd;        //!< File descriptor for the input device
       struct libevdev *_evdev; //!< Used to process events for this device
 
-      uint8_t _numButtons; //!< The total number of buttons on this device
-      uint8_t _numAxis; //!< The total numer of axis available on this device
+      std::string _name; //!< The reported name of the device
+      std::size_t _numButtons; //!< The total number of buttons on this device
+      std::size_t _numAxes; //!< The total numer of axes available on this device
       bool    _claimed; //!< Check if this is claimed for use
   };
 }
