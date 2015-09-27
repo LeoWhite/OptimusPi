@@ -3,6 +3,7 @@
  */
 #include <cstdint>
 #include <string>
+#include <thread>
 #include "linux/input.h"
 
 
@@ -43,10 +44,17 @@ namespace PiWars {
       // Reads in, and cache, information about the input device
       void populateInfo();
       
+      // Thread function for processing the events
+      static void processEvents(struct libevdev *_evdev, int processingFD);
+      
+      
       std::string _inputPath; //!< The file path of the input device
       int         _fd;        //!< File descriptor for the input device
       struct libevdev *_evdev; //!< Used to process events for this device
 
+      std::thread *_eventProcessing; //!< Thread used for processing the input event
+      int _eventProcessingFD; //!< Used to pass messages to the event processing thread
+        
       std::string _name; //!< The reported name of the device
       std::size_t _numButtons; //!< The total number of buttons on this device
       std::size_t _numAxes; //!< The total numer of axes available on this device

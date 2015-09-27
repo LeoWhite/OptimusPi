@@ -9,15 +9,21 @@ int main(int argc,char *argv[]) {
 
   std::string joystickPath("/dev/input/by-id/usb-Sony_PLAYSTATION_R_3_Controller-event-joystick");
   PiWars::InputDevice joystick(joystickPath);
-  
+
   std::cout << "Device name " << joystick.getName() << " axis : "<< joystick.getNumAxes() << " buttons: " << joystick.getNumButtons() << std::endl;
   if(joystick.claim()) {
-    std::cout << "Joystick claimed" << std::endl;    
+    std::cout << "Joystick claimed" << std::endl;
+
+    // Sleep so the input thread doesn't immediately get told to exit
+    std::this_thread::sleep_for (std::chrono::seconds(5));
+
+    std::cout << "Releasing joystick" << std::endl;
+    joystick.release();
   }
   else {
     std::cout << "Failed to claim joystick" << std::endl;
   }
-  
+
   return EXIT_SUCCESS;
 }
 
