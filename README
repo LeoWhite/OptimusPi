@@ -26,11 +26,27 @@ Raspberry Pi
  - Instal PiGPIO library (http://abyz.co.uk/rpi/pigpio/)
  - Install i2c tools (sudo apt-get install i2c-tools)
  - Add i2c-dev to /etc/modules
+
+ - Install libevdev
+   Currently this isn't in the repository so we need to run
+   - wget http://mirrordirector.raspbian.org/raspbian/pool/main/libe/libevdev/libevdev2_1.3+dfsg-1_armhf.deb
+   - wget http://mirrordirector.raspbian.org/raspbian/pool/main/libe/libevdev/libevdev-dev_1.3+dfsg-1_armhf.deb
+   - sudo dpkg -i libevdev2_1.3+dfsg-1_armhf.deb
+   - sudo dpkg -i  libevdev-dev_1.3+dfsg-1_armhf.deb
+
+ - Install GCC 4.9 (https://solarianprogrammer.com/2015/01/13/raspberry-pi-raspbian-install-gcc-compile-cpp-14-programs/)
+
  - Install GIT (sudo apt-get install git)
  - Check out repository (git clone git@github.com:LeoWhite/OptimusPi.git)
+ - Build source
+   cd OptimusPi
+   mkdir build
+   cd build
+   cmake -D CMAKE_CXX_COMPILER=g++-4.9 -D CMAKE_C_COMPILER=gcc-4.9 ../src/
+   make
 
  - Install support for PS3 controller (Article in https://www.raspberrypi.org/magpi-issues/MagPiSE1.pdf)
-
+  
  Optional
  - Install pygame for tests (sudo apt-get install python-pygame)
 
