@@ -5,6 +5,8 @@
 #include <string>
 #include "linux/input.h"
 
+#include "MessageQueue.h"
+
 namespace PiWars {
   enum class InputEventType {
     BUTTON,
@@ -41,4 +43,8 @@ namespace PiWars {
       int32_t _buttonValue;
       float _axisValue;
   };
+  
+  class InputEventQueue : public MessageQueue<InputEvent *> {
+  };
+  
 }

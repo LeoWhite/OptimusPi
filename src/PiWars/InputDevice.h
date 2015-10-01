@@ -1,19 +1,24 @@
 /**
  * Represents the various Input Devices
+ *
+ * Kernel Input event information https://www.kernel.org/doc/Documentation/input/event-codes.txt
  */
 #include <cstdint>
 #include <string>
 #include <thread>
 #include "linux/input.h"
 
-
 #include "libevdev.h"
 
+
 namespace PiWars {
+  
   enum class InputDeviceType {
     JOYSTICK
   };
 
+  // Represents an input device on the system, processing it
+  // for events
   class InputDevice {
     public:
       /**
@@ -45,7 +50,8 @@ namespace PiWars {
       void populateInfo();
       
       // Thread function for processing the events
-      static void processEvents(struct libevdev *_evdev, int processingFD);
+      static void processEvents(struct libevdev *evdev, int processingFD);
+      static void handleEvent(struct input_event *event);
       
       
       std::string _inputPath; //!< The file path of the input device

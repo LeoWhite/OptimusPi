@@ -2,10 +2,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <thread>
+#include <linux/input.h>
 
 #include <poll.h>
 #include <sys/eventfd.h>
 #include "InputDevice.h"
+#include "InputEvent.h"
 
 #include <iostream>
 
@@ -181,10 +183,31 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD) {
         } while (rc != -EAGAIN);
       }
       else {
-        std::cout << "Unknown eent" << std::endl;
+        std::cout << "Unknown event" << std::endl;
       }
     }
   }
 }
+
+void InputDevice::handleEvent(struct input_event *event) {
+  InputEvent *inputEvent = nullptr;
+  
+  // Is it a key code?
+  if(libevdev_event_is_type(event, EV_KEY)) {
+    inputEvent = new InputEvent(event->code, event->value);
+  }
+  else if(libevdev_event_is_type(event, EV_ABS)) {
+    // Normalise the axis into the range -1 to 1
+    float axisValue = (-1.0 + (2.0/255.0)* event->value);
+    
+    inputEvent = new InputEvent(event->code, axisValue);
+  }
+  
+  // Did we get an input event?
+  if(inputEvent) {
+    
+  }
+}
+  
 
 }
