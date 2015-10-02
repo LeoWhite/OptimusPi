@@ -57,6 +57,8 @@ namespace PiWars {
       float _powerRight; //!< Amount of power to apply to the right motor
       
       float _powerLimiter; //!< What to limit the power
+      
+      int _i2cHandle; //!< Handle to talk ot the motor via i2c
   };
 
 }
