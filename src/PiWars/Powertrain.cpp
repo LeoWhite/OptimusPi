@@ -28,6 +28,10 @@ Powertrain::Powertrain() : _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.
 }
 
 Powertrain::~Powertrain() {
+  // Stop the motors
+  stop();
+  
+  // And release pigpio library
   pigpio_stop();
 }
 
