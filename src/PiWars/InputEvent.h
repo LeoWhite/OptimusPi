@@ -22,7 +22,8 @@ namespace PiWars {
        */
       InputEvent(uint32_t code, int32_t value);
       InputEvent(uint32_t code, float value);
-      ~InputEvent();
+      InputEvent() {};
+      ~InputEvent() {};
 
       // Returns the type of this event
       InputEventType getType() { return _type; }
@@ -44,7 +45,7 @@ namespace PiWars {
       float _axisValue;
   };
   
-  class InputEventQueue : public MessageQueue<InputEvent *> {
+  class InputEventQueue : public MessageQueue<InputEvent> {
   };
   
 }

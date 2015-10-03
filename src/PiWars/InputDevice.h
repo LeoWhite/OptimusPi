@@ -13,6 +13,9 @@
 
 namespace PiWars {
   
+  class InputEvent;
+  class InputEventQueue;
+  
   enum class InputDeviceType {
     JOYSTICK
   };
@@ -44,14 +47,21 @@ namespace PiWars {
 
       // Returns the number of buttons on this device
       std::size_t getNumButtons() { return _numButtons; }
+        
+      // Sets the InputEvent queue to send input to
+      // Temporary API for testing!
+      void setEventQueue(InputEventQueue &queue);
+
+      // Removes the assigned queue
+      void resetEventQueue();
 
     private:
       // Reads in, and cache, information about the input device
       void populateInfo();
       
       // Thread function for processing the events
-      static void processEvents(struct libevdev *evdev, int processingFD);
-      static void handleEvent(struct input_event *event);
+      static void processEvents(struct libevdev *evdev, int processingFD, InputEventQueue *queue);
+      static void handleEvent(struct input_event *event, InputEventQueue *queue);
       
       
       std::string _inputPath; //!< The file path of the input device
@@ -65,5 +75,7 @@ namespace PiWars {
       std::size_t _numButtons; //!< The total number of buttons on this device
       std::size_t _numAxes; //!< The total numer of axes available on this device
       bool    _claimed; //!< Check if this is claimed for use
+      
+      InputEventQueue *_queue; //!< Input queue to send events to. Liable to change.. for test use only
   };
 }

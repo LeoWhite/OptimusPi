@@ -16,7 +16,7 @@ namespace PiWars
 
 InputDevice::InputDevice(std::string &filePath) :
   _inputPath(filePath), _fd(-1), _evdev(nullptr), _eventProcessing(nullptr),
-  _eventProcessingFD(-1),  _numButtons(0), _numAxes(0), _claimed(false)
+  _eventProcessingFD(-1),  _numButtons(0), _numAxes(0), _claimed(false), _queue(nullptr)
 {
   _eventProcessingFD = eventfd(0, 0);
 
@@ -64,7 +64,7 @@ bool InputDevice::claim() {
 
     // Create a FD to pass messages to the processing thread
     // Spin off a thread to handle processing the input
-    _eventProcessing = new std::thread(processEvents, _evdev, _eventProcessingFD);
+    _eventProcessing = new std::thread(processEvents, _evdev, _eventProcessingFD, _queue);
 
     // Successfully claimed!
     _claimed = true;
@@ -120,7 +120,15 @@ void InputDevice::populateInfo(void) {
 
 }
 
-void InputDevice::processEvents(struct libevdev *evdev, int processingFD) {
+void InputDevice::setEventQueue(InputEventQueue &queue) {
+  _queue = &queue;
+}
+
+void InputDevice::resetEventQueue() {
+  _queue = nullptr;
+}
+
+void InputDevice::processEvents(struct libevdev *evdev, int processingFD, InputEventQueue *queue) {
   struct pollfd fds[2];
 
   // Query the file descriptor so we can correctly wait for events
@@ -178,7 +186,7 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD) {
     			}
     			// We've actually read something!
     			else if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
-    			  // IMPROVE: Process the event here
+    			  handleEvent(&ev, queue);
     			}
         } while (rc != -EAGAIN);
       }
@@ -189,7 +197,7 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD) {
   }
 }
 
-void InputDevice::handleEvent(struct input_event *event) {
+void InputDevice::handleEvent(struct input_event *event, InputEventQueue *queue) {
   InputEvent *inputEvent = nullptr;
   
   // Is it a key code?
@@ -204,8 +212,8 @@ void InputDevice::handleEvent(struct input_event *event) {
   }
   
   // Did we get an input event?
-  if(inputEvent) {
-    
+  if(nullptr != inputEvent && nullptr != queue) {
+    queue->push(*inputEvent);
   }
 }
   

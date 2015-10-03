@@ -14,13 +14,12 @@
 #include <unistd.h>
 #include <sys/eventfd.h>
 
-
 namespace PiWars {
 
 template <class T> class MessageQueue {
   public:
     MessageQueue() {
-      _fd =  eventfd(0, 0);
+      _fd =  eventfd(0, EFD_NONBLOCK);
     }
    
     // Returns the FD that the thread can block on
