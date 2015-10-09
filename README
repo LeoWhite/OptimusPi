@@ -32,6 +32,7 @@ Raspberry Pi
    - wget http://mirrordirector.raspbian.org/raspbian/pool/main/libe/libevdev/libevdev2_1.3+dfsg-1_armhf.deb
    - wget http://mirrordirector.raspbian.org/raspbian/pool/main/libe/libevdev/libevdev-dev_1.3+dfsg-1_armhf.deb
    - sudo dpkg -i libevdev2_1.3+dfsg-1_armhf.deb
+   - sudo apt-get install libjs-jquery
    - sudo dpkg -i  libevdev-dev_1.3+dfsg-1_armhf.deb
 
  - Install GCC 4.9 (https://solarianprogrammer.com/2015/01/13/raspberry-pi-raspbian-install-gcc-compile-cpp-14-programs/)
