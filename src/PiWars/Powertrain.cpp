@@ -13,10 +13,10 @@ namespace PiWars
 {
 
 Powertrain::Powertrain() : _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.0f), _i2cHandle(-1) {
-  if(0 != pigpio_start(NULL, NULL)) {
+  /*if(0 != pigpio_start(NULL, NULL)) {
     std::cerr << "Failed to connect to pigpiod, is it running?" << std::endl;
     exit(-1);
-  }
+  }*/
   
   _i2cHandle = i2c_open(1, 0x07, 0);
   
