@@ -2,6 +2,8 @@
  * Deals with the various input mechanism that we will
  * be utilizing (mostly just the joystick to begin with
  */
+#ifndef _PIWARS_INPUTMANAGER_H
+#define _PIWARS_INPUTMANAGER_H
 
 namespace PiWars {
 
@@ -21,3 +23,5 @@ namespace PiWars {
 
   };
 }
+
+#endif

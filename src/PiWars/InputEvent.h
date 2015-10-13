@@ -1,6 +1,9 @@
 /**
  * Represents an InputEvent
  */
+#ifndef _PIWARS_INPUTEVENT_H
+#define _PIWARS_INPUTEVENT_H
+
 #include <cstdint>
 #include <string>
 #include "linux/input.h"
@@ -49,3 +52,4 @@ namespace PiWars {
   };
   
 }
+#endif

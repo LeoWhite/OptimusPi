@@ -3,6 +3,10 @@
  *
  * Kernel Input event information https://www.kernel.org/doc/Documentation/input/event-codes.txt
  */
+ 
+#ifndef _PIWARS_INPUTDEVICE_H
+#define _PIWARS_INPUTDEVICE_H
+
 #include <cstdint>
 #include <string>
 #include <thread>
@@ -79,3 +83,4 @@ namespace PiWars {
       InputEventQueue *_queue; //!< Input queue to send events to. Liable to change.. for test use only
   };
 }
+#endif

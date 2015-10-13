@@ -3,6 +3,8 @@
  *
  * A library of functionality targetted towards performing the PiWars 2015 challenges.
  */
+#ifndef _PIWARS_PIWARS_H
+#define _PIWARS_PIWARS_H
 
 // Our PiWars namespace to make sure we don't clash with any other APIs/libraries we
 // may end up using
@@ -29,3 +31,4 @@ class PiWars {
 };
 
 }
+#endif

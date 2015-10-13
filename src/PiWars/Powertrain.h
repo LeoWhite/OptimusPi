@@ -2,6 +2,10 @@
  * The Powertrain represents the Engine, gearbox, drive and wheels of the robot.
  * Altogether this allows the robot to be driven around and moved.
  */
+ 
+#ifndef _PIWARS_POWERTRAIN_H
+#define _PIWARS_POWERTRAIN_H
+
 #include <cstdint>
 
 namespace PiWars {
@@ -62,3 +66,4 @@ namespace PiWars {
   };
 
 }
+#endif

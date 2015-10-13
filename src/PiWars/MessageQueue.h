@@ -8,6 +8,9 @@
  *
  * Code is based on several examples found online.
  */
+#ifndef _PIWARS_MESSAGEQUEUE_H
+#define _PIWARS_MESSAGEQUEUE_H
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -71,3 +74,5 @@ template <class T> class MessageQueue {
 };
 
 }
+
+#endif
