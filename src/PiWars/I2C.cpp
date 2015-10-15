@@ -62,6 +62,26 @@ size_t I2C::readBytes(char *buffer, size_t length) {
   return read;
 }
 
+bool I2C::writeByte(const uint8_t byte) {  
+  if(i2c_write_byte(_i2cHandle, byte) >= 0) {
+    return true;
+  }
+  
+  return false;
+}
+
+bool I2C::readByte(uint8_t &byte) {
+  int read;
+  
+  read = i2c_read_byte(_i2cHandle);
+  if(read >= 0) {
+    byte = (uint8_t)read;
+    return true;
+  }
+  
+  return false;
+}
+
 void I2C::initPIGPIOD() {
   if(0 != pigpio_start(NULL, NULL)) {
     std::cerr << "Failed to connect to pigpiod, is it running?" << std::endl;

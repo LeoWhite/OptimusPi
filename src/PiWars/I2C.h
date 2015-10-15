@@ -39,6 +39,18 @@ namespace PiWars {
       // @returns Number of bytes read
       size_t readBytes(char *buffer, size_t length);
       
+      // Writes a single byte to the device
+      // 
+      // @param byte The byte to write
+      // @returns true if the byte was written
+      bool writeByte(const uint8_t byte);
+      
+      // Reads a single byte
+      //
+      // @param byte Where to read the byte into
+      // @returns true if the byte was successfully read
+      bool readByte(uint8_t &byte);
+      
     private:
       static void initPIGPIOD(); //!< Initialise a connection to the PIGPIO daemon
       
