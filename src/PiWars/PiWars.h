@@ -12,22 +12,28 @@ namespace PiWars {
 
 // Forwards declaratinos
 class Brains;
+class Powertrain;
 
 class PiWars {
   public:
     PiWars();
 
-    ~PiWars() {
-    }
+    ~PiWars();
 
     /**
      * Returns the 'Brains' for this PiWars instance.
      */
-    Brains *getBrains() { return _brains; }
+    Brains *brains() { return _brains; }
+
+    /**
+     * Returns the 'PowerTrain' for this PiWars instance.
+     */
+    Powertrain *powertrain() { return _powertrain; }
 
   private:
 
     Brains *_brains;
+    Powertrain *_powertrain;
 };
 
 }

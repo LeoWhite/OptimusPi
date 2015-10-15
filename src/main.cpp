@@ -3,6 +3,7 @@
 #include <poll.h>
 
 #include "OptimusPiConfig.h"
+#include "PiWars.h"
 #include "InputDevice.h"
 #include "InputEvent.h"
 #include "Powertrain.h"
@@ -12,7 +13,7 @@ int main(int argc,char *argv[]) {
   std::cout << "Version " << OptimusPi_VERSION_MAJOR << "." << OptimusPi_VERSION_MINOR << std::endl;  
   std::string joystickPath("/dev/input/by-id/usb-Sony_PLAYSTATION_R_3_Controller-event-joystick");
   PiWars::InputDevice joystick(joystickPath);
-  PiWars::Powertrain powertrain;
+  PiWars::PiWars optimusPi;
 
   PiWars::InputEventQueue inputQueue;
     
@@ -72,13 +73,13 @@ int main(int argc,char *argv[]) {
 
         if(updateMotor) {
           std::cout << "Setting motor " << leftMotor << " - " <<  rightMotor << std::endl;;
-          powertrain.setPower(leftMotor, rightMotor);
+          optimusPi.powertrain()->setPower(leftMotor, rightMotor);
        }
         
       }      
     }
 
-    powertrain.stop();
+    optimusPi.powertrain()->stop();
     
     std::cout << "Releasing joystick" << std::endl;
     joystick.release();
