@@ -24,6 +24,10 @@ template <class T> class MessageQueue {
     MessageQueue() {
       _fd =  eventfd(0, EFD_NONBLOCK);
     }
+    
+    ~MessageQueue() {
+      close(_fd);
+    }
    
     // Returns the FD that the thread can block on
     int getFD() { return _fd; };

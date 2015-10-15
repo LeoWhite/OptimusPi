@@ -1,6 +1,6 @@
 /**
  * The I2C class allows for communication with I2C devices connected to the 
- * Raspberry Pi. This includes 
+ * Raspberry Pi.
  */
 
 #ifndef _PIWARS_I2C_H
@@ -40,8 +40,7 @@ namespace PiWars {
       size_t readBytes(char *buffer, size_t length);
       
     private:
-      // Initialze a connection to the PIGPIO daemon
-      static void initPIGPIOD();
+      static void initPIGPIOD(); //!< Initialise a connection to the PIGPIO daemon
       
       uint8_t _i2cAddress; //!< Address of the I2CDevice
       

@@ -1,12 +1,6 @@
 #include "Powertrain.h"
 #include "InputDevice.h"
 
-// The pigpiod_if header file doesn't protect itself when included from
-// C++, so force it to be treated as 'C' here.
-extern "C" {
-#include "pigpiod_if.h"
-}
-
 #include <iostream>
 
 namespace PiWars
@@ -18,9 +12,6 @@ Powertrain::Powertrain() : I2C(0x07), _powerLeft(0.0f), _powerRight(0.0f), _powe
 Powertrain::~Powertrain() {
   // Stop the motors
   stop();
-  
-  // And release pigpio library
-  pigpio_stop();
 }
 
 void Powertrain::stop() {

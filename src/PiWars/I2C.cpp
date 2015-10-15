@@ -67,6 +67,9 @@ void I2C::initPIGPIOD() {
     std::cerr << "Failed to connect to pigpiod, is it running?" << std::endl;
     exit(-1);
   }
+  
+  // We want to stop the pigpio connection when the program exits
+  std::atexit(pigpio_stop);
 }
 
 }
