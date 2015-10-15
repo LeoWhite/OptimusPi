@@ -7,6 +7,7 @@
 #define _PIWARS_POWERTRAIN_H
 
 #include <cstdint>
+#include "I2C.h"
 
 namespace PiWars {
   // Forward declaration
@@ -14,7 +15,7 @@ namespace PiWars {
 
   // An Engine represents one or more motors with the ability to turn
   // left or right, either via tank track driving, or with a steering column.
-  class Powertrain {
+  class Powertrain : public I2C {
     public:
       Powertrain();
       ~Powertrain();
@@ -61,8 +62,6 @@ namespace PiWars {
       float _powerRight; //!< Amount of power to apply to the right motor
       
       float _powerLimiter; //!< What to limit the power
-      
-      int _i2cHandle; //!< Handle to talk ot the motor via i2c
   };
 
 }

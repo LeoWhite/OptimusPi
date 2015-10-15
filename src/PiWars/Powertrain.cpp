@@ -12,19 +12,7 @@ extern "C" {
 namespace PiWars
 {
 
-Powertrain::Powertrain() : _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.0f), _i2cHandle(-1) {
-  if(0 != pigpio_start(NULL, NULL)) {
-    std::cerr << "Failed to connect to pigpiod, is it running?" << std::endl;
-    exit(-1);
-  }
-  
-  _i2cHandle = i2c_open(1, 0x07, 0);
-  
-  if(_i2cHandle < 0) {
-    std::cerr << "Failed to open i2c?" << std::endl;
-    exit(-1);
-  }
-    
+Powertrain::Powertrain() : I2C(0x07), _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.0f) {
 }
 
 Powertrain::~Powertrain() {
@@ -36,8 +24,8 @@ Powertrain::~Powertrain() {
 }
 
 void Powertrain::stop() {
-  if(_i2cHandle >= 0) {
-    if(i2c_write_device(_i2cHandle, "\x11", 1) < 0 ) {
+  if(exists()) {
+    if(!writeBytes((const char *)"\x11", 1)) {
       std::cerr << "Failed to send stop!" << std::endl;
     }
   }
@@ -50,24 +38,26 @@ bool Powertrain::setPower(float left, float right) {
     _powerLeft = left;
     _powerRight = right;
     
-    char message[5];
-    int16_t powerLeft = 100 * _powerLeft * _powerLimiter;
-    int16_t powerRight = 100 * _powerRight * _powerLimiter;
-    
-    // Prepare the message for sending        
-    message[0] = '\x12';
-    message[1] = (powerLeft >> 8) & 0xFF;
-    message[2] = (powerLeft) & 0xFF;
-    message[3] = (powerRight >> 8) & 0xFF;
-    message[4] = (powerRight) & 0xFF;
-
-    if(i2c_write_device(_i2cHandle, message, 5) < 0 ) {
-      std::cerr << "Failed to send power!" << std::endl;
-    }
-    else {
-      std::this_thread::sleep_for (std::chrono::milliseconds(100));
-
-      result = true;
+    if(exists()) {
+      char message[5];
+      int16_t powerLeft = 100 * _powerLeft * _powerLimiter;
+      int16_t powerRight = 100 * _powerRight * _powerLimiter;
+      
+      // Prepare the message for sending        
+      message[0] = '\x12';
+      message[1] = (powerLeft >> 8) & 0xFF;
+      message[2] = (powerLeft) & 0xFF;
+      message[3] = (powerRight >> 8) & 0xFF;
+      message[4] = (powerRight) & 0xFF;
+  
+      if(writeBytes(message, 5) < 0 ) {
+        std::cerr << "Failed to send power!" << std::endl;
+      }
+      else {
+        std::this_thread::sleep_for (std::chrono::milliseconds(100));
+  
+        result = true;
+      }
     }
   }
   
