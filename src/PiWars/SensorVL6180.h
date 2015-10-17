@@ -7,6 +7,8 @@
 #ifndef _PIWARS_SENSORVL6180_H
 #define _PIWARS_SENSORVL6180_H
 
+#include <atomic>
+#include <thread>
 #include <cstdint>
 #include <cstddef>
 
@@ -27,15 +29,34 @@ class SensorVL6180 : public Sensor, public I2C {
     //
     // @returns true if the sensor exists
     bool exists();
-    
-    uint8_t range();
+
+    // Enables the sensor ready for use.
+    // Some sensors use additional power or CPU resources
+    // when running, so we only want to enable them when
+    // we're ready to use them
+    // @returns true if successfully enabled
+    bool enable();
+
+    // Disable a sensor, potentially reducing power or CPU usage
+    void disable();
+   
+    // Returns the current range in mm
+    //
+    // @returns The range in mm.  Note: A range of 255 indicates the range wasn't
+    // read for some reason
+    uint8_t range() { return _range.load(); }
 
   private:
-    void init();
-    void writeByte(uint16_t reg, char data);
-    char readByte(uint16_t reg);
+    void init(); //<! Initialise the range sensor
+    static void writeByte(I2C *i2c, uint16_t reg, char data); //<! The VL6180 has 16 bit registers, so we need a special write call
+    static char readByte(I2C *i2c, uint16_t reg); //<! The VL6180 has 16 bit registers, so we need a special read call
+    static void rangeReader(std::atomic<bool> &quit, std::atomic<uint8_t> &range); //<! Background thread for polling the sensor
 
     bool _initialised; //<! Indicates if the sensor has been intialised
+    std::atomic<uint8_t> _range; //<! The last successfully read in range.
+      
+    std::thread *_rangeReader; //<! Background thread for reading in the range
+    std::atomic<bool> _rangeReaderQuit; //<! Used to indicate when the thread should exit
 };
 
 }

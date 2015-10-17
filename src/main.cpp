@@ -7,6 +7,7 @@
 #include "InputDevice.h"
 #include "InputEvent.h"
 #include "Powertrain.h"
+#include "SensorVL6180.h"
 
 int main(int argc,char *argv[]) {
   std::cout << "Hello World!" << std::endl;
@@ -14,14 +15,15 @@ int main(int argc,char *argv[]) {
   std::string joystickPath("/dev/input/by-id/usb-Sony_PLAYSTATION_R_3_Controller-event-joystick");
   PiWars::InputDevice joystick(joystickPath);
   PiWars::PiWars optimusPi;
+  PiWars::SensorVL6180 vl6180;
 
   PiWars::InputEventQueue inputQueue;
-    
+        
   // Attach the input event queue
   joystick.setEventQueue(inputQueue);
 
   std::cout << "Device name " << joystick.getName() << " axis : "<< joystick.getNumAxes() << " buttons: " << joystick.getNumButtons() << std::endl;
-  if(joystick.claim()) {
+  if(vl6180.enable() && joystick.claim()) {
     struct pollfd fds[2];
     float leftMotor = 0.0, rightMotor = 0.0;
   
@@ -74,6 +76,8 @@ int main(int argc,char *argv[]) {
         if(updateMotor) {
           std::cout << "Setting motor " << leftMotor << " - " <<  rightMotor << std::endl;;
           optimusPi.powertrain()->setPower(leftMotor, rightMotor);
+          std::cout << "Range: " << (int)vl6180.range() << "mm" << std::endl;;
+    
        }
         
       }      

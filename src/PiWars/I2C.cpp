@@ -41,7 +41,7 @@ bool I2C::writeBytes(const char *bytes, size_t length) {
   bool result = true;
   
   if(i2c_write_device(_i2cHandle, (char *)bytes, length) < 0 ) {
-    std::cerr << "Failed to send stop!" << std::endl;
+    std::cerr << "Failed to send message!" << std::endl;
     result = false;
   }  
   
