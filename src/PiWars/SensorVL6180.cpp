@@ -7,7 +7,7 @@ namespace PiWars
 {
 
   
-SensorVL6180::SensorVL6180() : Sensor(), I2C(0x29), _initialised(false), _range(0), _rangeReader(nullptr), _rangeReaderQuit(false) {
+SensorVL6180::SensorVL6180() : Sensor(), I2C(0x29), _initialised(false), _range(255), _rangeReader(nullptr), _rangeReaderQuit(false) {
 }
 
 SensorVL6180::~SensorVL6180() {
@@ -19,6 +19,9 @@ bool SensorVL6180::exists() {
 
 bool SensorVL6180::enable() {
   if(!isEnabled()) {
+    // Set the 'cached' range to max
+    _range = 255;
+    
     // Initialise the sensor
     init();
 
