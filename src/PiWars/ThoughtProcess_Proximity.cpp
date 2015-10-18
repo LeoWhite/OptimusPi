@@ -39,7 +39,7 @@ void ThoughtProcess_Proximity::run() {
     uint8_t range = _vl6180->range();
     float power = 0.0;
 
-    if(range < 20) {
+    if(range <= 20) {
       std::cerr << "Stopping" << std::endl;
       // Stop!
       power = 0.0;
@@ -49,16 +49,16 @@ void ThoughtProcess_Proximity::run() {
     }
     else if(range < 50) {
       // getting closer
-      power = 0.25;
+      power = 0.18;
     }
     else if(range < 100) {
       // Drop to quarter
-      power = 0.50;
+      power = 0.30;
     }
     // Long way to go yet!
     else {
       // Proceed forwards at half speed
-      power = 0.66;
+      power = 0.50;
     }
 
     // Set the motors
@@ -69,7 +69,7 @@ void ThoughtProcess_Proximity::run() {
     } 
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(100));
+    std::this_thread::sleep_for (std::chrono::microseconds(10));
   }
  
   robot()->powertrain()->stop();
