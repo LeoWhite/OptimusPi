@@ -65,7 +65,6 @@ void ThoughtProcess_Proximity::run() {
     if(lastPower != power) {
       robot()->powertrain()->setPower(power, power);
       std::cerr << "Range is " << (int)range << "mm setting power to " << power << std::endl;
-      lastPower = power;
     } 
 
     // Let the robot actually move
