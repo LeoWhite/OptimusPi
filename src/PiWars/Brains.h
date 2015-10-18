@@ -3,10 +3,15 @@
 
 namespace PiWars
 {
+  class ThoughtProcess;
+  
   class Brains
   {
     public:
       Brains();
+      
+    private:
+      ThoughtProcess *_currentProcess;
   };
 }
 #endif

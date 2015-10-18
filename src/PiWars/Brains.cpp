@@ -1,10 +1,10 @@
 #include "Brains.h"
+#include "ThoughtProcess.h"
 
 namespace PiWars
 {
 
-// Simple place holder for now.. Not sure I'll be keeping this class
-Brains::Brains() {
+Brains::Brains() : _currentProcess(nullptr) {
 }
 
 }
