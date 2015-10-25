@@ -42,6 +42,23 @@ int qtr8RCCalibrateStart(byte *i2cArgs, uint8_t *pi2cResponse) {
  */
 int qtr8RCCalibrateStop(byte *i2cArgs, uint8_t *pi2cResponse) {
   calibrating = false;
+
+  for (int i = 0; i < qtr8RCSensorCount; i++)
+  {
+    Serial.print(qtrrc.calibratedMinimumOn[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+
+  // print the calibration maximum values measured when emitters were on
+  for (int i = 0; i < qtr8RCSensorCount; i++)
+  {
+    Serial.print(qtrrc.calibratedMaximumOn[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+  Serial.println();
+  
   return 0;
 }
 
@@ -54,17 +71,21 @@ int qtr8RCCalibrateStop(byte *i2cArgs, uint8_t *pi2cResponse) {
 int qtr8RCReadSensor(byte *i2cArgs, uint8_t *pi2cResponse) {
   unsigned int position = qtrrc.readLine(sensorValues);
   uint8_t i2cResponseArg = 0;
+
+  if(calibrating) {
+    qtr8RCCalibrateStop(i2cArgs, pi2cResponse);
   
+  }
   // Convert results to the i2c format
 
   // print the sensor values as numbers from 0 to 1000, where 0 means maximum reflectance and
   // 1000 means minimum reflectance, followed by the line position
   for (unsigned char i = 0; i < qtr8RCSensorCount; i++)
   {
-    // Scale the value down to 0-100
-    pi2cResponse[i2cResponseArg++] = sensorValues[i] / 10;
-    Serial.print(sensorValues[i]);
-    Serial.print('\t');
+    pi2cResponse[i2cResponseArg++] = highByte(sensorValues[i]);
+    pi2cResponse[i2cResponseArg++] = lowByte(sensorValues[i]);
+    //Serial.print(sensorValues[i]);
+    //Serial.print('\t');
   }
 
   // Store the position as a 16 bit value
@@ -72,7 +93,7 @@ int qtr8RCReadSensor(byte *i2cArgs, uint8_t *pi2cResponse) {
   pi2cResponse[i2cResponseArg++] = lowByte(position);
   
   //Serial.println(); // uncomment this line if you are using raw values
-  Serial.println(position); // comment this line out if you are using raw values
+  //Serial.println(position); // comment this line out if you are using raw values
 
   return i2cResponseArg;
 }
