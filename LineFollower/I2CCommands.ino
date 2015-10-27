@@ -34,6 +34,8 @@ extern const i2cCommand supportedI2Ccmd[] = {
 // The i2c address we will be using
 #define SLAVE_ADDRESS 0x08
 
+static int i2cMaxCommands = (sizeof(supportedI2Ccmd) / sizeof(supportedI2Ccmd[0]));
+
 int argsCnt = 0;                        // how many arguments were passed with given command
 
 byte i2cArgs[I2C_MSG_ARGS_MAX];         // array to store args received from master
@@ -94,15 +96,17 @@ void receiveData(int howMany){
   if (howMany) {
     cmdRcvd = Wire.read();                 // receive first byte - command assumed
     howMany--; // Skip the 'command' byte
-    while(howMany--){               // receive rest of tramsmission from master assuming arguments to the command
-      if (argIndex < I2C_MSG_ARGS_MAX){
-        argIndex++;
-        i2cArgs[argIndex] = Wire.read();
+    if(howMany) {
+      while(howMany--){               // receive rest of tramsmission from master assuming arguments to the command
+        if (argIndex < I2C_MSG_ARGS_MAX){
+          argIndex++;
+          i2cArgs[argIndex] = Wire.read();
+        }
+        else{
+          ; // implement logging error: "too many arguments"
+        }
+        argsCnt = argIndex+1;  
       }
-      else{
-        ; // implement logging error: "too many arguments"
-      }
-      argsCnt = argIndex+1;  
     }
   }
   else{
@@ -112,7 +116,7 @@ void receiveData(int howMany){
   
   // validating command is supported by slave
   int fcnt = -1;
-  for (int i = 0; i < sizeof(supportedI2Ccmd); i++) {
+  for (int i = 0; i < i2cMaxCommands; i++) {
     if (supportedI2Ccmd[i].command == cmdRcvd && 
         supportedI2Ccmd[i].numberOfArgs == argsCnt) 
     {
@@ -120,6 +124,7 @@ void receiveData(int howMany){
     }
   }
 
+  Serial.println(fcnt);
   if (fcnt<0){
     // implement logging error: "command not supported"
     Serial.println("not supported");
@@ -133,6 +138,8 @@ void receiveData(int howMany){
 
 // callback for sending data
 void sendData(){  
+  Serial.println("write");
+  
   // Send the cached response
   Wire.write(i2cResponse, i2cResponseLen);
   

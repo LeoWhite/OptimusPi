@@ -32,6 +32,8 @@ extern const i2cCommand supportedI2Ccmd[] = {
 // The i2c address we will be using
 #define SLAVE_ADDRESS 0x07
 
+static int i2cMaxCommands = (sizeof(supportedI2Ccmd) / sizeof(supportedI2Ccmd[0]));
+
 int argsCnt = 0;                        // how many arguments were passed with given command
 
 byte i2cArgs[I2C_MSG_ARGS_MAX];         // array to store args received from master
@@ -72,16 +74,6 @@ void I2C_CheckCommands() {
     extraArgs = requestedCmd->fnCallback(i2cArgs, &i2cResponse[1]);
     i2cResponseLen += extraArgs;
     
-    // Calculate the checksum for the response to
-    // allow some simple error checking
-    uint8_t CS = i2cResponseLen;
-    for (int i = 0; i<i2cResponseLen; i++){
-      CS^=i2cResponse[i];
-    } 
-
-    // Append the checksum to the end of the response arguments
-    i2cResponse[i2cResponseLen++] = CS;  
-    
     // Clear pointer so we don't trigger it twice
     requestedCmd = NULL;    
   }
@@ -116,34 +108,11 @@ void receiveData(int howMany){
   else{
     // implement logging error: "empty request"
     return;
-  }
+  }  
   
-  // Calculate the checksum
-  uint8_t CS = (argsCnt - 1) + 1;
-  
-  // Starts with the length, followed by the command, followed by all bits of the message
-  // excluding the checksum
-  CS^=cmdRcvd;
-  for (int i = 0; i<(argsCnt - 1); i++){
-    CS^=i2cArgs[i];
-  } 
-  
-  // Does it match?
-  if(CS != i2cArgs[argsCnt - 1]) {    
-    // Perform a stop
-    Serial.print("invalid checksum:");
-    Serial.println(CS);
-    MotorsStop();
-    
-    return;
-  }
-  
-  // We don't include the checksum in the message
-  argsCnt--;
-
   // validating command is supported by slave
   int fcnt = -1;
-  for (int i = 0; i < sizeof(supportedI2Ccmd); i++) {
+  for (int i = 0; i < i2cMaxCommands; i++) {
     if (supportedI2Ccmd[i].command == cmdRcvd && 
         supportedI2Ccmd[i].numberOfArgs == argsCnt) 
     {
@@ -153,7 +122,10 @@ void receiveData(int howMany){
 
   if (fcnt<0){
     // implement logging error: "command not supported"
-    Serial.println("not supported");
+    Serial.print("not supported");
+    Serial.print(cmdRcvd);
+    Serial.print(":");
+    Serial.println(argsCnt);
     return;
   }
   
