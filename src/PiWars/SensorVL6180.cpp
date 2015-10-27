@@ -7,7 +7,7 @@ namespace PiWars
 {
 
   
-SensorVL6180::SensorVL6180() : Sensor(), I2C(0x29), _initialised(false), _range(255), _rangeReader(nullptr), _rangeReaderQuit(false) {
+SensorVL6180::SensorVL6180() : Sensor(), I2CInternal(0x29), _initialised(false), _range(255), _rangeReader(nullptr), _rangeReaderQuit(false) {
 }
 
 SensorVL6180::~SensorVL6180() {
@@ -53,7 +53,7 @@ void SensorVL6180::disable() {
 }
 
 void SensorVL6180::rangeReader(std::atomic<bool> &quit, std::atomic<uint8_t> &range) {
-  I2C rangeSensor(0x29);
+  I2CInternal rangeSensor(0x29);
 
   while(!quit.load()) {
     uint32_t attempts = 0;

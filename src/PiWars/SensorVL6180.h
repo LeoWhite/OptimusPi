@@ -17,7 +17,7 @@
 
 namespace PiWars {
 
-class SensorVL6180 : public Sensor, public I2C {
+class SensorVL6180 : public Sensor, public I2CInternal {
   public:
     // Initialize the VL6180 ready for use
     SensorVL6180();
