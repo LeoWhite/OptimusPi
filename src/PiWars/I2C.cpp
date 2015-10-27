@@ -142,25 +142,46 @@ bool I2CExternal::readByte(uint8_t &byte) {
 }
   
 bool I2CExternal::writeBytes(const char *bytes, size_t length) {
-  bool result = true;
+  bool success = false;
+  char command[64];
+  int commandLength = 0;
   
-/*  if(i2c_write_device(_i2cHandle, (char *)bytes, length) < 0 ) {
-    std::cerr << "Failed to send message!" << std::endl;
-    result = false;
-  }  
-  */
-  return result;
+  // Is the length too long?
+  if(length > 32) {
+    return false;
+  }
+  
+  command[commandLength++] = 0x04; // Set address
+  command[commandLength++] = address();
+  command[commandLength++] = 0x02; // Start
+  command[commandLength++] = 0x07; // Write
+  command[commandLength++] = length; // umber of bytes
+  
+  // Copy the bytes to send
+  memcpy(&command[commandLength], bytes,length);
+  commandLength += length;
+  
+  command[commandLength++] = 0x03; // Stop
+  command[commandLength++] = 0x00; // End
+  
+  if(0 == bb_i2c_zip(SDA_PIN, command, commandLength, NULL, 0)) {
+    success = true;
+  }
+
+  return success;
 }
 
 size_t I2CExternal::readBytes(char *buffer, size_t length) {
-  int read;
+  // Set Address, address, Start, Read, lengt, Stop, End 
+  char command[] = { 0x04, address(), 0x02, 0x06, (char)length, 0x03, 0x00};
+  size_t read = 0;
   
-  //read = i2c_read_device(_i2cHandle, buffer, length);
+  if(length > 0xFF) {
+    return false;
+  }
   
-  // Did we fail?
-  if(read < 0) {
-    // Set to 0 for now
-    read = 0;
+  if(length == bb_i2c_zip(SDA_PIN, command, sizeof(command), buffer, length)) {
+    read = length;
   }
   
   return read;
