@@ -7,7 +7,7 @@ namespace PiWars
 {
 
   
-SensorQTR8RC::SensorQTR8RC() : Sensor(), I2CInternal(0x8), _initialised(false) {
+SensorQTR8RC::SensorQTR8RC() : Sensor(), I2CExternal(0x8), _initialised(false) {
 }
 
 SensorQTR8RC::~SensorQTR8RC() {
