@@ -36,6 +36,7 @@ void ThoughtProcess_StraightLine::run() {
   float lastPowerLeft = -1.0, lastPowerRight = -1.0;
   float pitch, roll, yaw;
   
+  std::chrono::time_point<std::chrono::system_clock> start, end; 
   float heading;
   
   // Let the sensor settle down
@@ -44,8 +45,17 @@ void ThoughtProcess_StraightLine::run() {
   // Get the heading that we want to maintain
   _rtimu->fusion(pitch, roll, yaw);
   heading = yaw + 180;
-  
-  while(true) {
+
+  std::cerr << "Selected heading " << heading << std::endl;
+
+  // Start the motors off at 50% so we don't pull too much current when we jump to 66%
+  robot()->powertrain()->setPower(0.50, 0.50);
+ 
+  // Note the start time
+  start = std::chrono::system_clock::now();
+ 
+  while(true)
+  {
     float currentHeading, offset, powerLeft, powerRight;
     
     // Get the heading that we want to maintain
@@ -57,36 +67,47 @@ void ThoughtProcess_StraightLine::run() {
     // What's the difference?
     offset = currentHeading - heading;
 
+    std::cerr << "Current heading " << currentHeading << " offset " << offset << "\r" << std::flush;
     // Very simple checks    
-    if(offset < 1.0) {
+    if(offset > 0) {
       // We want to move left slightly
-      powerLeft = 0.35;
-      powerRight = 0.50;
+      powerLeft = 0.55;
+      powerRight = 0.66;
     }
-    else if(offset > 1.0) {
+    else if(offset < 0) {
       // Move right
-      powerLeft = 0.50;
-      powerRight = 0.35;
+      powerLeft = 0.66;
+      powerRight = 0.55;
     }
     else {
       // straight on!
-      powerLeft = 0.50;
-      powerRight = 0.50;
+      powerLeft = 0.66;
+      powerRight = 0.66;
     }
     
     // Set the motors
     if(lastPowerLeft != powerLeft || lastPowerRight != powerRight) {
       robot()->powertrain()->setPower(powerLeft, powerRight);
-      std::cerr << "setting power to " << powerLeft << ":" << powerRight << std::endl;
+      //std::cerr << "setting power to " << powerLeft << ":" << powerRight << std::endl;
       lastPowerLeft = powerLeft;
       lastPowerRight = powerRight;
     } 
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(200));
+    std::this_thread::sleep_for (std::chrono::microseconds(100));
+
+    end = std::chrono::system_clock::now();
+    std::chrono::duration<float> duration = end - start;
+
+ 
+    if(duration.count() >= 5.0){
+      break;
+    }
   }
  
   robot()->powertrain()->stop();
+  
+  std::cerr << std::endl << "Done!" << std::endl;
 }
 
 void ThoughtProcess_StraightLine::stop() {
