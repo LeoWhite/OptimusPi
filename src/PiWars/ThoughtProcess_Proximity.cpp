@@ -23,6 +23,12 @@ ThoughtProcess_Proximity::~ThoughtProcess_Proximity() {
   }
 }
 
+const std::string &ThoughtProcess_Proximity::name() {
+  static std::string name("Proximity");
+    
+  return name;
+}
+
 bool ThoughtProcess_Proximity::available() {
   return _vl6180->exists();
 }

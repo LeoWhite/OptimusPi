@@ -23,6 +23,12 @@ ThoughtProcess_ThreePointTurn::~ThoughtProcess_ThreePointTurn() {
   }
 }
 
+const std::string &ThoughtProcess_ThreePointTurn::name() {
+  static std::string name("ThreePointTurn");
+    
+  return name;
+}
+
 bool ThoughtProcess_ThreePointTurn::available() {
   return _rtimu->exists();
 }

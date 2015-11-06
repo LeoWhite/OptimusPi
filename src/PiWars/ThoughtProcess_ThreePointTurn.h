@@ -24,6 +24,8 @@ class ThoughtProcess_ThreePointTurn : public ThoughtProcess {
     ThoughtProcess_ThreePointTurn(PiWars *robot);
     ~ThoughtProcess_ThreePointTurn();
     
+    const std::string &name();
+    
     bool available();
     
     bool prepare();

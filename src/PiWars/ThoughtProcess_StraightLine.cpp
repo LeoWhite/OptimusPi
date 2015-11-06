@@ -23,6 +23,12 @@ ThoughtProcess_StraightLine::~ThoughtProcess_StraightLine() {
   }
 }
 
+const std::string &ThoughtProcess_StraightLine::name() {
+  static std::string name("StraightLine");
+    
+  return name;
+}
+
 bool ThoughtProcess_StraightLine::available() {
   return _rtimu->exists();
 }

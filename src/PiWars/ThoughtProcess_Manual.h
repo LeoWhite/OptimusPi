@@ -17,6 +17,8 @@ class ThoughtProcess_Manual : public ThoughtProcess {
     ThoughtProcess_Manual(PiWars *robot);
     ~ThoughtProcess_Manual();
     
+    const std::string &name();
+
     bool available();
     
     bool prepare();

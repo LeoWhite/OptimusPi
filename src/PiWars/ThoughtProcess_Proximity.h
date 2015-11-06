@@ -20,6 +20,8 @@ class ThoughtProcess_Proximity : public ThoughtProcess {
     ThoughtProcess_Proximity(PiWars *robot);
     ~ThoughtProcess_Proximity();
     
+    const std::string &name();
+
     bool available();
     
     bool prepare();

@@ -11,7 +11,6 @@
 
 namespace PiWars {
 
-  
 ThoughtProcess_LineFollower::ThoughtProcess_LineFollower(PiWars *robot) : ThoughtProcess(robot), _qtr8rc(new SensorQTR8RC()) {
 }
 
@@ -21,6 +20,12 @@ ThoughtProcess_LineFollower::~ThoughtProcess_LineFollower() {
     delete _qtr8rc;
     _qtr8rc = nullptr;
   }
+}
+
+const std::string &ThoughtProcess_LineFollower::name() {
+  static std::string name("LineFollower");
+    
+  return name;
 }
 
 bool ThoughtProcess_LineFollower::available() {

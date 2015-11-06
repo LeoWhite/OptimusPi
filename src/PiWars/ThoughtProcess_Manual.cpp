@@ -32,6 +32,12 @@ ThoughtProcess_Manual::~ThoughtProcess_Manual() {
   }
 }
 
+const std::string &ThoughtProcess_Manual::name() {
+  static std::string name("Manual");
+    
+  return name;
+}
+
 bool ThoughtProcess_Manual::available() {
   bool available = false;
   struct stat buffer;   

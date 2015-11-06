@@ -19,6 +19,8 @@ class ThoughtProcess_LineFollower : public ThoughtProcess {
     ThoughtProcess_LineFollower(PiWars *robot);
     ~ThoughtProcess_LineFollower();
     
+    const std::string &name();
+
     bool available();
     
     bool prepare();

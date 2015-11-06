@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <unistd.h>
 #include <sys/eventfd.h>
+#include <string>
 
 namespace PiWars {
   class PiWars;
@@ -22,7 +23,10 @@ class ThoughtProcess {
     //              is part of
     ThoughtProcess(PiWars *robot) : _robot(robot) {
     }
-    
+
+    // Returns the name of the ThoughtProcess
+    virtual const std::string &name() = 0;
+          
     // Checks if this 'ThoughtProcess' is avaible for use.
     // Some processes may have requirements for specific
     // sensors, so if they are not attached then the process
@@ -42,7 +46,7 @@ class ThoughtProcess {
     PiWars *robot() { return _robot; }
 
   private:
-    PiWars *_robot;
+    PiWars *_robot; //<! The PiWars robot the ThoughtProcesses run on
 };
 
 }

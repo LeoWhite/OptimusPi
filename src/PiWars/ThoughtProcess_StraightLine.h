@@ -22,6 +22,8 @@ class ThoughtProcess_StraightLine : public ThoughtProcess {
     ThoughtProcess_StraightLine(PiWars *robot);
     ~ThoughtProcess_StraightLine();
     
+    const std::string &name();
+
     bool available();
     
     bool prepare();
