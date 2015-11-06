@@ -49,10 +49,7 @@ void ThoughtProcess_ThreePointTurn::run() {
   // Start the motors off at 50% so we don't pull too much current when we jump to 66%
   robot()->powertrain()->setPower(0.50, 0.50);
  
-  driveForDuration(heading, true, 5.0);
-  
-  // Stop
-  robot()->powertrain()->stop();
+  driveForDuration(heading, false, 2.0);
   
   // Turn left
   heading = heading - 90;
@@ -61,16 +58,19 @@ void ThoughtProcess_ThreePointTurn::run() {
     heading = 360 + heading;
   }
    
+  std::cerr << "Turning left to " << heading << std::endl;
   turnLeft(heading);
   
   // Drive forwards again
-  driveForDuration(heading, true, 2.0f);
+  
+  std::cerr << "forwards" << std::endl;
+  driveForDuration(heading, false, 1.0f);
   
   // Drive backwards
-  driveForDuration(heading, false, 4.0f);
+  driveForDuration(heading, true, 2.0f);
   
   // Forwards again
-  driveForDuration(heading, true, 2.0f);
+  driveForDuration(heading, false, 1.0f);
   
   // Turn left again
   heading = heading - 90;
@@ -82,7 +82,7 @@ void ThoughtProcess_ThreePointTurn::run() {
   turnLeft(heading);
 
   // and finally head home
-  driveForDuration(heading, true, 5.0f);
+  driveForDuration(heading, false, 2.0f);
 
   std::cerr << std::endl << "Done!" << std::endl;
 }
@@ -164,11 +164,11 @@ void ThoughtProcess_ThreePointTurn::driveForDuration(const float heading, const 
 }
 
 void ThoughtProcess_ThreePointTurn::turnLeft(const float heading) {
-  float lastPowerLeft = 0.0f, lastPowerRight = 0.0f;
-
+  // Start turning left
+  robot()->powertrain()->setPower(-0.50, 0.50);
   while(true)
   {
-    float currentHeading, offset, powerLeft, powerRight;
+    float currentHeading, offset;
     float pitch, roll, yaw;
     
     // Get the heading that we want to maintain
@@ -184,22 +184,13 @@ void ThoughtProcess_ThreePointTurn::turnLeft(const float heading) {
     // Very simple checks    
     if(offset > 0.25) {
       // Keep turning left
-      powerLeft =  -0.50;
-      powerRight = 0.50;
+  robot()->powertrain()->setPower(-0.50, 0.50);
     }
     else {
       // We've arrived
       break;            
     }
     
-    // Set the motors
-    if(lastPowerLeft != powerLeft || lastPowerRight != powerRight) {
-      robot()->powertrain()->setPower(powerLeft, powerRight);
-      //std::cerr << "setting power to " << powerLeft << ":" << powerRight << std::endl;
-      lastPowerLeft = powerLeft;
-      lastPowerRight = powerRight;
-    } 
-
     // Let the robot actually move
     std::this_thread::sleep_for (std::chrono::microseconds(100));
   }
