@@ -1,8 +1,14 @@
 /**
- * The ThoughtProcess class represents a specific control mode for the
- * robot. Be it the code to allow the robot to be manually driven around,
- * or the code to complete a challenge.
+ * This ThoughtProcess is responsible for guiding the robot through
+ * the three point turn challenge
+ *
+ * http://piwars.org/2015-competition/challenges/three-point-turn/
+ *
+ * Currently we make use of the SenseHAT, via the RTIMU library, to
+ * determine our current heading, and dead reckoning to 
+ * drive round the course.
  */
+
 
 #ifndef _PIWARS_THOUGHT_PROCESS_THREE_POINT_TURN_H
 #define _PIWARS_THOUGHT_PROCESS_THREE_POINT_TURN_H
@@ -18,16 +24,12 @@ class ThoughtProcess_ThreePointTurn : public ThoughtProcess {
     ThoughtProcess_ThreePointTurn(PiWars *robot);
     ~ThoughtProcess_ThreePointTurn();
     
-    // Proximity checks can only occur when the appropiate
-    // sensors are available.
     bool available();
     
-    // Enable the Sensor and Powertrain
     bool prepare();
     
     void run();
     
-    // Force the ThoughtProcess to stop
     void stop();
 
   private:

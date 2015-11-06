@@ -1,7 +1,11 @@
 /**
- * The ThoughtProcess class represents a specific control mode for the
- * robot. Be it the code to allow the robot to be manually driven around,
- * or the code to complete a challenge.
+ * This ThoughtProcess is responsible for keeping the robot
+ * on a straight line as it attempts the straight line 
+ * speed challenge 
+ * http://piwars.org/2015-competition/challenges/straight-line-speed-test/
+ *
+ * Currently we make use of the SenseHAT, via the RTIMU library, to
+ * determine our current heading.
  */
 
 #ifndef _PIWARS_THOUGHT_PROCESS_STRAIGHT_LINE_H
@@ -18,16 +22,12 @@ class ThoughtProcess_StraightLine : public ThoughtProcess {
     ThoughtProcess_StraightLine(PiWars *robot);
     ~ThoughtProcess_StraightLine();
     
-    // Proximity checks can only occur when the appropiate
-    // sensors are available.
     bool available();
     
-    // Enable the Sensor and Powertrain
     bool prepare();
     
     void run();
     
-    // Force the ThoughtProcess to stop
     void stop();
 
   private:

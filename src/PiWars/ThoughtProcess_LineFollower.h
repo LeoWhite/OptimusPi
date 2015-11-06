@@ -1,7 +1,7 @@
 /**
- * The ThoughtProcess class represents a specific control mode for the
- * robot. Be it the code to allow the robot to be manually driven around,
- * or the code to complete a challenge.
+ * This ThoughtProcess is responsible for guiding the robot through
+ * the Line following challenge as defined at
+ * http://piwars.org/2015-competition/challenges/line-follower/
  */
 
 #ifndef _PIWARS_THOUGHT_PROCESS_LINE_FOLLOWER_H
@@ -11,6 +11,7 @@
 
 namespace PiWars {
 
+// Forward declare the classes we'll be using
 class SensorQTR8RC;
 
 class ThoughtProcess_LineFollower : public ThoughtProcess {
@@ -18,16 +19,12 @@ class ThoughtProcess_LineFollower : public ThoughtProcess {
     ThoughtProcess_LineFollower(PiWars *robot);
     ~ThoughtProcess_LineFollower();
     
-    // Proximity checks can only occur when the appropiate
-    // sensors are available.
     bool available();
     
-    // Enable the Sensor and Powertrain
     bool prepare();
     
     void run();
     
-    // Force the ThoughtProcess to stop
     void stop();
 
   private:
