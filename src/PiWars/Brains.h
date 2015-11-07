@@ -9,6 +9,7 @@
 #ifndef _PIWARS_BRAINS_H
 #define _PIWARS_BRAINS_H
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -38,6 +39,11 @@ namespace PiWars
       // iteration through it
       //
       // @returns the vector of known processes
+      template <class F>
+      void forEachThoughtProcess(F f) const
+      {
+        std::for_each(begin(_processes), end(_processes), f);
+      }
       const ThoughtProcess::vector &processes() {
         return _processes;
       }

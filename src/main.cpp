@@ -30,6 +30,13 @@ int main(int argc,char *argv[]) {
     }
   }
   
+  optimusPi.brains()->forEachThoughtProcess([](PiWars::ThoughtProcess::ptr n)
+    {
+      if(n->available()) { 
+        std::cerr << "Process " << n->name() << " is available" << std::endl;
+      }
+    });
+    
   optimusPi.brains()->enableThoughtProcess(3);
   
 /*  std::cout << process->name() << std::endl;
