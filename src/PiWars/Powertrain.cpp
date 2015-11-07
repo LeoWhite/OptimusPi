@@ -6,7 +6,7 @@
 namespace PiWars
 {
 
-Powertrain::Powertrain() : I2CInternal(0x07), _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.0f) {
+Powertrain::Powertrain() : I2CExternal(0x07), _powerLeft(0.0f), _powerRight(0.0f), _powerLimiter(1.0f) {
 }
 
 Powertrain::~Powertrain() {

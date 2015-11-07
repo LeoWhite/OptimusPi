@@ -7,7 +7,7 @@ namespace PiWars
 {
 
   
-SensorVL6180::SensorVL6180() : Sensor(), I2CInternal(0x29), _initialised(false), _range(255), _rangeReader(nullptr), _rangeReaderQuit(false) {
+SensorVL6180::SensorVL6180() : Sensor(), I2CExternal(0x29), _initialised(false), _range(255), _rangeReader(nullptr), _rangeReaderQuit(false) {
 }
 
 SensorVL6180::~SensorVL6180() {

@@ -15,7 +15,7 @@ namespace PiWars {
 
   // An Engine represents one or more motors with the ability to turn
   // left or right, either via tank track driving, or with a steering column.
-  class Powertrain : public I2CInternal {
+  class Powertrain : public I2CExternal {
     public:
       Powertrain();
       ~Powertrain();
