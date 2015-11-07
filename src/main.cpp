@@ -23,6 +23,13 @@ int main(int argc,char *argv[]) {
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_StraightLine>(&optimusPi));
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_ThreePointTurn>(&optimusPi));
   
+  // List out all the available processes
+  for(auto n : optimusPi.brains()->processes()) {
+    if(n->available()) {
+      std::cerr << "Process " << n->name() << " is available" << std::endl;
+    }
+  }
+  
   optimusPi.brains()->enableThoughtProcess(3);
   
 /*  std::cout << process->name() << std::endl;

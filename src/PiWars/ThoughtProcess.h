@@ -11,13 +11,19 @@
 #include <cstddef>
 #include <unistd.h>
 #include <sys/eventfd.h>
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace PiWars {
   class PiWars;
   
 class ThoughtProcess {
   public:
+    typedef std::shared_ptr<ThoughtProcess> ptr;
+    typedef std::vector<ptr> vector;
+    typedef vector::iterator iterator;
+    
     //
     // @param robot The PiWars robot this ThoughtProcess 
     //              is part of

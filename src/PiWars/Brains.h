@@ -12,10 +12,10 @@
 #include <memory>
 #include <vector>
 
+#include "ThoughtProcess.h"
+
 namespace PiWars
 {
-  class ThoughtProcess;
-  
   class Brains
   {
     public:
@@ -25,16 +25,26 @@ namespace PiWars
       // controlled by the Brain
       // 
       // @param thoughtProcess The process to add, the Brain will take control of it
-      void addThoughtProcess(std::shared_ptr<ThoughtProcess>thoughtProcess);
+      void addThoughtProcess(ThoughtProcess::ptr thoughtProcess);
       
       // Enables the specified through process
       // @param Index of the thought process to enable
+      //
+      // @returns true if the process was enabled
+      //          false otherwise (Process isn't available)
       bool enableThoughtProcess(std::size_t process);
       
+      // Returns the vector of Processess to allow
+      // iteration through it
+      //
+      // @returns the vector of known processes
+      const ThoughtProcess::vector &processes() {
+        return _processes;
+      }
       
     private:
-      std::vector<std::shared_ptr<ThoughtProcess>> _processes;
-      std::shared_ptr<ThoughtProcess> _currentProcess;      
+      ThoughtProcess::vector _processes;
+      ThoughtProcess::ptr _currentProcess;      
   };
 }
 #endif

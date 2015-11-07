@@ -11,7 +11,7 @@ Brains::Brains() {
 
 }
 
-void Brains::addThoughtProcess(std::shared_ptr<ThoughtProcess>thoughtProcess) {
+void Brains::addThoughtProcess(ThoughtProcess::ptr  thoughtProcess) {
   // Add it to the vector.
   // IMPROVE: Do we want to check for duplicates?
   _processes.push_back(thoughtProcess);
@@ -20,8 +20,6 @@ void Brains::addThoughtProcess(std::shared_ptr<ThoughtProcess>thoughtProcess) {
 bool Brains::enableThoughtProcess(std::size_t process) {
   bool enabled = false;
   
-  std::cerr << "size is " << _processes.size() << std::endl;
-    
   // Is it a valid offset? And is it active?
   if(process < _processes.size() && _processes[process]->available()) {
     // Do we have an existing process to tidy up?
