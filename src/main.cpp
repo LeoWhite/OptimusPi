@@ -37,7 +37,8 @@ int main(int argc,char *argv[]) {
       }
     });
     
-  optimusPi.brains()->enableThoughtProcess(3);
+  optimusPi.run();
+  //optimusPi.brains()->enableThoughtProcess(3);
   
 /*  std::cout << process->name() << std::endl;
   

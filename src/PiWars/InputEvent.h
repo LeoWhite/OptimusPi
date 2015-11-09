@@ -16,6 +16,12 @@ namespace PiWars {
     AXIS
   };
 
+  enum class InputEventButtonValue {
+    RELEASE = 0,
+    PRESS,
+    REPEAT
+  };
+  
   // Holds all the information around an InputEvent that can
   // be sent through the system
   class InputEvent {
@@ -29,16 +35,16 @@ namespace PiWars {
       ~InputEvent() {};
 
       // Returns the type of this event
-      InputEventType getType() { return _type; }
+      InputEventType getType() const { return _type; }
       
-      // Returns the type of this event
-      uint32_t getCode() { return _code; }
+      // Returns the code of this event
+      uint32_t getCode() const { return _code; }
 
       // Query the button value
-      int32_t getButtonValue() { return _buttonValue; }
+      int32_t getButtonValue() const { return _buttonValue; }
       
       // Query the axis value
-      float getAxisValue() { return _axisValue; }
+      float getAxisValue() const { return _axisValue; }
 
     private:
       InputEventType _type;
