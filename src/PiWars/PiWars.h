@@ -18,6 +18,7 @@ class Powertrain;
 class InputDevice;
 class InputEvent;
 class InputEventQueue;
+class Menu;
 
 class PiWars {
   public:
@@ -43,7 +44,7 @@ class PiWars {
     void updateDisplay();
     
   private:
-
+    bool _running;
     Brains *_brains;
     Powertrain *_powertrain;
     ArduiPi_OLED *_display;
@@ -51,6 +52,7 @@ class PiWars {
     InputEventQueue *_inputQueue;    
     
     bool _menuActive;
+    Menu *_menu;
 };
 
 }

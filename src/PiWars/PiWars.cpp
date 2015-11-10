@@ -1,5 +1,6 @@
 #include "PiWars.h"
 #include "Brains.h"
+#include "Menu.h"
 #include "Powertrain.h"
 #include "InputDevice.h"
 #include "InputEvent.h"
@@ -19,12 +20,14 @@ namespace PiWars
   static std::string fiveWayPath = "/dev/input/event0";
 
   PiWars::PiWars() 
-    : _brains(new Brains())
+    : _running(false)
+    , _brains(new Brains())
     , _powertrain(new Powertrain())
     , _display(new ArduiPi_OLED())
     , _fiveWay(nullptr)
     , _inputQueue(nullptr)
     , _menuActive(false)
+    , _menu(new Menu())
   {
     // Ensure the motors are stopped
     _powertrain->stop();
@@ -32,8 +35,7 @@ namespace PiWars
     // Claim the five way controller
     _fiveWay = new InputDevice(fiveWayPath);
     _inputQueue = new InputEventQueue();
-    
-  
+      
     // Attach the input event queue
     _fiveWay->setEventQueue(*_inputQueue);
     
@@ -41,6 +43,12 @@ namespace PiWars
       std::cerr << "Unable to find five way" << std::endl;
       exit(-1);
     }
+    
+    // Populate the menu
+    _menu->add(new MenuItem("Info"));
+    _menu->add(new MenuItem("Brains"));
+    _menu->add(new MenuItem("Stop"));
+    _menu->add(new MenuItem("Shutdown"));
     
     // Initialise the display
     _display->init(OLED_I2C_RESET, OLED_ADAFRUIT_I2C_128x64);
@@ -52,6 +60,14 @@ namespace PiWars
   }
   
   PiWars::~PiWars() {
+    // Display shutdown message
+    _display->clearDisplay();
+    _display->setTextSize(1);
+    _display->setTextColor(WHITE);
+    _display->setCursor(0,0);
+    _display->print("Shutting down\n");
+    _display->display();
+    
     delete _fiveWay;
     delete _inputQueue;
     delete _brains;
@@ -62,12 +78,17 @@ namespace PiWars
   void PiWars::run() {
     struct pollfd fds[2];
   
+    // We are now running
+    _running = true;
+    
     // Query the file descriptor so we can correctly wait for events
     fds[0].fd = _inputQueue->getFD();
     fds[0].events = POLLIN;
     fds[0].revents = 0;
       
-    while(int result = poll(fds, 1, -1)) {
+    while(_running) {
+      int result = poll(fds, 1, -1);
+      
       if(-1 == result) {
         std::cerr << "PiWars: Poll returned error" << std::endl;
         continue;
@@ -110,14 +131,44 @@ namespace PiWars
   }
   
   void PiWars::processButton(const InputEvent &event) {
-    // Is the menu not currently active?
-    if(!_menuActive) {
-      // Is it the 'OK' button
-      if(KEY_ENTER == event.getCode() && (int32_t)InputEventButtonValue::RELEASE == event.getButtonValue()) {
-        std::cerr << "OK button pressed, creating menu" << std::endl;
-        generateMenu();
-        _menuActive = true;
+    // We only respond to key release
+    if((int32_t)InputEventButtonValue::RELEASE == event.getButtonValue() )
+    {
+      // Is the menu not currently active?
+      if(!_menuActive) {
+        // Is it the 'OK' button
+        if(KEY_ENTER == event.getCode()) {
+          _menu->update();
+          _menuActive = true;
+        }
       }
+      else {
+        if(KEY_UP == event.getCode()) {
+          _menu->next();
+        }
+        else if(KEY_DOWN == event.getCode()) {
+          _menu->previous();
+        }
+        else if(KEY_ENTER) {
+          std::cerr << "Processing " << _menu->current() << std::endl;
+           
+          // Assume the menu will no longer be active
+          _menuActive = false;
+ 
+          if(0 == _menu->current().compare("Info")) {
+          }
+          else if(0 == _menu->current().compare("Brains")) {
+          }
+          else if(0 == _menu->current().compare("Stop")) {
+          }
+          else if(0 == _menu->current().compare("Shutdown")) {
+            _running = false;
+          }
+        }
+        
+      }
+      
+      updateDisplay();
     }
   }
   
@@ -132,28 +183,11 @@ namespace PiWars
     _display->print("Stats\n");
     _display->setCursor(0,10);
     _display->print("Current: ThreePointTurn\n");
-    _display->setCursor(0,40);
     
     if(_menuActive) {
-      _display->print("Select:\n");
-      _display->setCursor(0,50);
-      _display->print("| LineFollower      >\n");
-      
-      
-      for(uint32_t i = 0; i < 5; i++) {
-        uint32_t numItems = 5;
-        uint32_t length = 128 / numItems;
-        
-        uint32_t startX = i * (length + 1);
-  
-        if(i == 3) {      
-          _display->drawLine(startX, 62, startX + length, 62, WHITE);
-        }
-        else {
-          _display->drawLine(startX, 62, startX + 1, 62, WHITE);
-        }
-      }
+      _menu->render(_display, 40, 128);
     }
+    
     _display->display();
     
   }
