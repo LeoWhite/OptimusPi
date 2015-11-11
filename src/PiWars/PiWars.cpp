@@ -18,6 +18,10 @@ namespace PiWars
 {
 
   static std::string fiveWayPath = "/dev/input/event0";
+  static std::string menuItemInfo = "Info";
+  static std::string menuItemBrains = "Brains";
+  static std::string menuItemShutdown = "Shutdown";
+  
 
   PiWars::PiWars() 
     : _running(false)
@@ -26,8 +30,8 @@ namespace PiWars
     , _display(new ArduiPi_OLED())
     , _fiveWay(nullptr)
     , _inputQueue(nullptr)
-    , _menuActive(false)
-    , _menu(new Menu())
+    , _mainMenu(new Menu())
+    , _currentMenu(nullptr)
   {
     // Ensure the motors are stopped
     _powertrain->stop();
@@ -45,10 +49,9 @@ namespace PiWars
     }
     
     // Populate the menu
-    _menu->add(new MenuItem("Info"));
-    _menu->add(new MenuItem("Brains"));
-    _menu->add(new MenuItem("Stop"));
-    _menu->add(new MenuItem("Shutdown"));
+    _mainMenu->add(new MenuItem(menuItemInfo));
+    _mainMenu->add(new MenuItem(menuItemBrains));
+    _mainMenu->add(new MenuItem(menuItemShutdown));
     
     // Initialise the display
     _display->init(OLED_I2C_RESET, OLED_ADAFRUIT_I2C_128x64);
@@ -68,6 +71,7 @@ namespace PiWars
     _display->print("Shutting down\n");
     _display->display();
     
+    delete _mainMenu;
     delete _fiveWay;
     delete _inputQueue;
     delete _brains;
@@ -87,11 +91,27 @@ namespace PiWars
     fds[0].revents = 0;
       
     while(_running) {
-      int result = poll(fds, 1, -1);
+      int result = poll(fds, 1, 1000);
       
       if(-1 == result) {
         std::cerr << "PiWars: Poll returned error" << std::endl;
         continue;
+      }
+      else if(0 == result) {
+        // A timeout occured. 
+        
+        // Do we need to dismiss the menu?
+        if(_currentMenu) {
+          std::chrono::duration<float> duration = std::chrono::system_clock::now() - _lastInput;
+          
+          // After 5 seconds of inactivity we dismiss the menu
+          if(duration.count() >= 5.0f) {
+            _currentMenu = nullptr;
+          }
+        }
+
+        // And update the display
+        updateDisplay();
       }
       else {
         // Anyting else should be from the input device
@@ -113,59 +133,56 @@ namespace PiWars
           }
         }        
       }
-      // Display the menu
-
-      // Wait for the a selection
-
-      // Check results
-
-      // Select ThoughtProcess to run
-
-      // or exit? 
-
-      // Display 'currently running'?
-
-      // On key press display 'Stop'
-
     }
   }
   
   void PiWars::processButton(const InputEvent &event) {
+    // Remember when we recieved this input
+    _lastInput = std::chrono::system_clock::now();
+    
     // We only respond to key release
     if((int32_t)InputEventButtonValue::RELEASE == event.getButtonValue() )
     {
       // Is the menu not currently active?
-      if(!_menuActive) {
+      if(!_currentMenu) {
         // Is it the 'OK' button
         if(KEY_ENTER == event.getCode()) {
-          _menu->update();
-          _menuActive = true;
+          // Display the main menu
+          _currentMenu = _mainMenu;
         }
       }
       else {
         if(KEY_UP == event.getCode()) {
-          _menu->next();
+          _currentMenu->next();
         }
         else if(KEY_DOWN == event.getCode()) {
-          _menu->previous();
+          _currentMenu->previous();
         }
         else if(KEY_ENTER) {
-          std::cerr << "Processing " << _menu->current() << std::endl;
+          bool isMainMenu = (_currentMenu == _mainMenu);
+          std::string currentEntry = _currentMenu->current();
+          
+          std::cerr << "Processing " << _currentMenu->current() << std::endl;
+
+          // Assume the menu will no longer be active after this
+          _currentMenu = nullptr;
            
-          // Assume the menu will no longer be active
-          _menuActive = false;
- 
-          if(0 == _menu->current().compare("Info")) {
+          // Are we on the main menu?
+          if(isMainMenu) { 
+            if(0 == currentEntry.compare(menuItemInfo)) {            
+            }
+            else if(0 == currentEntry.compare(menuItemBrains)) {
+              _currentMenu = _brains->menu();
+            }
+            else if(0 == currentEntry.compare(menuItemShutdown)) {
+              _running = false;
+            }
           }
-          else if(0 == _menu->current().compare("Brains")) {
+          else {
+            // Currently we assume it must be the 'Brains' menu
+            _brains->selectMenuEntry(currentEntry);
           }
-          else if(0 == _menu->current().compare("Stop")) {
-          }
-          else if(0 == _menu->current().compare("Shutdown")) {
-            _running = false;
-          }
-        }
-        
+        }        
       }
       
       updateDisplay();
@@ -184,8 +201,8 @@ namespace PiWars
     _display->setCursor(0,10);
     _display->print("Current: ThreePointTurn\n");
     
-    if(_menuActive) {
-      _menu->render(_display, 40, 128);
+    if(_currentMenu) {
+      _currentMenu->render(_display, 40, 128);
     }
     
     _display->display();

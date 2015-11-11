@@ -6,6 +6,8 @@
 #ifndef _PIWARS_PIWARS_H
 #define _PIWARS_PIWARS_H
 
+#include <chrono>
+
 class ArduiPi_OLED;
 
 // Our PiWars namespace to make sure we don't clash with any other APIs/libraries we
@@ -51,8 +53,9 @@ class PiWars {
     InputDevice *_fiveWay;
     InputEventQueue *_inputQueue;    
     
-    bool _menuActive;
-    Menu *_menu;
+    std::chrono::time_point<std::chrono::system_clock> _lastInput;
+    Menu *_mainMenu;
+    Menu *_currentMenu;
 };
 
 }

@@ -17,6 +17,9 @@
 
 namespace PiWars
 {
+  // Forward declarations
+  class Menu;
+  
   class Brains
   {
     public:
@@ -29,12 +32,29 @@ namespace PiWars
       void addThoughtProcess(ThoughtProcess::ptr thoughtProcess);
       
       // Enables the specified through process
+      // @param The thought process to enable
+      //
+      // @returns true if the process was enabled
+      //          false otherwise (Process isn't available)
+      bool enableThoughtProcess(ThoughtProcess::ptr process);
+      
+      // Enables the specified through process
       // @param Index of the thought process to enable
       //
       // @returns true if the process was enabled
       //          false otherwise (Process isn't available)
       bool enableThoughtProcess(std::size_t process);
       
+      // Returns a menu containing all the active through processes
+      // @returns A populated menu
+      Menu *menu();
+
+      // Selects the specific menu entry name, triggering
+      // any related actions associated to it.
+      //
+      // @param The name of the menu entry that has been selected
+      void selectMenuEntry(const std::string &entry);
+
       // Returns the vector of Processess to allow
       // iteration through it
       //
