@@ -37,11 +37,10 @@ bool ThoughtProcess_Proximity::prepare() {
   return _vl6180->enable();
 }
 
-void ThoughtProcess_Proximity::run() {
-  bool running = true;
+void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
   float lastPower = -1.0;
 
-  while(running) {
+  while(running.load()) {
     uint8_t range = _vl6180->range();
     float power = 0.0;
 
@@ -79,9 +78,6 @@ void ThoughtProcess_Proximity::run() {
   }
  
   robot()->powertrain()->stop();
-}
-
-void ThoughtProcess_Proximity::stop() {
 }
 
 }

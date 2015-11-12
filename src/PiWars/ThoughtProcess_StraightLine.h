@@ -28,9 +28,7 @@ class ThoughtProcess_StraightLine : public ThoughtProcess {
     
     bool prepare();
     
-    void run();
-    
-    void stop();
+    void run(std::atomic<bool> &running);
 
   private:
     SensorRTIMU *_rtimu; //<! We use the RTIMU for detecting direction

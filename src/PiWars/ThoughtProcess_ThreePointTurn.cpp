@@ -37,7 +37,7 @@ bool ThoughtProcess_ThreePointTurn::prepare() {
   return _rtimu->enable();
 }
 
-void ThoughtProcess_ThreePointTurn::run() {
+void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   float pitch, roll, yaw;
   
   std::chrono::time_point<std::chrono::system_clock> start, end; 
@@ -91,10 +91,6 @@ void ThoughtProcess_ThreePointTurn::run() {
   driveForDuration(heading, false, 2.0f);
 
   std::cerr << std::endl << "Done!" << std::endl;
-}
-
-
-void ThoughtProcess_ThreePointTurn::stop() {
 }
 
 void ThoughtProcess_ThreePointTurn::driveForDuration(const float heading, const bool backwards, const float seconds)

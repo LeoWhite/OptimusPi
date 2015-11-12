@@ -30,9 +30,7 @@ class ThoughtProcess_ThreePointTurn : public ThoughtProcess {
     
     bool prepare();
     
-    void run();
-    
-    void stop();
+    void run(std::atomic<bool> &running);
 
   private:
     // Drive on the specific heading, in the specified direction for the 

@@ -10,11 +10,20 @@ namespace PiWars
 
 static std::string menuItemStop = "Stop";
 
-Brains::Brains() {
+Brains::Brains() 
+  : _currentProcess(nullptr)
+  , _currentProcessThread(nullptr)
+  , _currentProcessRunning(false)
+{
 
 }
 
-void Brains::addThoughtProcess(ThoughtProcess::ptr  thoughtProcess) {
+Brains::~Brains() {
+  // Stop the current proces (if any) 
+  stopCurrentThoughtProcess();
+}
+
+void Brains::addThoughtProcess(ThoughtProcess::ptr thoughtProcess) {
   // Add it to the vector.
   // IMPROVE: Do we want to check for duplicates?
   _processes.push_back(thoughtProcess);
@@ -42,13 +51,7 @@ Menu *Brains::menu() {
 void Brains::selectMenuEntry(const std::string &entry) {
   // Is it the special 'stop' entry?
   if(0 == entry.compare(menuItemStop)) {
-    if(_currentProcess) {
-      // Tell it to stop
-      _currentProcess->stop();
-      
-      // and then clear it
-      _currentProcess.reset();
-    }
+    stopCurrentThoughtProcess();
   }
   // Check through the list of processes
   else {
@@ -80,13 +83,7 @@ bool Brains::enableThoughtProcess(ThoughtProcess::ptr process) {
   // Is it a valid process? And is it available?
   if(process && process->available()) {
     // Do we have an existing process to tidy up?
-    if(_currentProcess) {
-      // Tell it to stop
-      _currentProcess->stop();
-      
-      // and then clear it
-      _currentProcess.reset();
-    }
+    stopCurrentThoughtProcess();
     
     // Select the processes
     _currentProcess = process;
@@ -94,7 +91,8 @@ bool Brains::enableThoughtProcess(ThoughtProcess::ptr process) {
     std::cerr << "Enabling process " << _currentProcess->name() << std::endl;
       
     if(_currentProcess->prepare()) {
-      _currentProcess->run();
+      _currentProcessRunning = true;
+      _currentProcessThread = new std::thread(currentProcessRun, std::ref(_currentProcessRunning), std::ref(_currentProcess));
       enabled = true;
     }
     else {
@@ -104,6 +102,24 @@ bool Brains::enableThoughtProcess(ThoughtProcess::ptr process) {
   }
   
   return enabled;
+}
+
+void Brains::stopCurrentThoughtProcess() {
+  if(_currentProcess) {
+    // Tell it to stop
+    _currentProcessRunning = false;
+
+    // Wait for the running thread to stop
+    _currentProcessThread->join();
+    _currentProcessThread = nullptr;
+        
+    // and then clear it
+    _currentProcess.reset();
+  }
+}
+
+void Brains::currentProcessRun(std::atomic<bool> &running, ThoughtProcess::ptr &process) {
+  process->run(running);
 }
 
 }

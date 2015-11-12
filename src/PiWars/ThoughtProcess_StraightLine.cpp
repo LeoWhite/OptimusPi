@@ -37,8 +37,7 @@ bool ThoughtProcess_StraightLine::prepare() {
   return _rtimu->enable();
 }
 
-void ThoughtProcess_StraightLine::run() {
-  bool running = true;
+void ThoughtProcess_StraightLine::run(std::atomic<bool> &running) {
   float lastPowerLeft = -1.0, lastPowerRight = -1.0;
   float pitch, roll, yaw;
   
@@ -60,7 +59,7 @@ void ThoughtProcess_StraightLine::run() {
   // Note the start time
   start = std::chrono::system_clock::now();
  
-  while(true)
+  while(running.load())
   {
     float currentHeading, offset, powerLeft, powerRight;
     
@@ -114,9 +113,6 @@ void ThoughtProcess_StraightLine::run() {
   robot()->powertrain()->stop();
   
   std::cerr << std::endl << "Done!" << std::endl;
-}
-
-void ThoughtProcess_StraightLine::stop() {
 }
 
 }

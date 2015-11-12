@@ -36,11 +36,10 @@ bool ThoughtProcess_LineFollower::prepare() {
   return _qtr8rc->enable();
 }
 
-void ThoughtProcess_LineFollower::run() {
-  bool running = true;
+void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
   float lastPowerLeft = -1.0, lastPowerRight = -1.0;
 
-  while(true) {
+  while(running.load()) {
     uint16_t sensorDiff[8] = {0};
     uint16_t position;
     float powerLeft, powerRight;
@@ -132,9 +131,6 @@ void ThoughtProcess_LineFollower::run() {
   }
  
   robot()->powertrain()->stop();
-}
-
-void ThoughtProcess_LineFollower::stop() {
 }
 
 }

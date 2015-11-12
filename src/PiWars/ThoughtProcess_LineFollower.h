@@ -25,7 +25,7 @@ class ThoughtProcess_LineFollower : public ThoughtProcess {
     
     bool prepare();
     
-    void run();
+    void run(std::atomic<bool> &running);
     
     void stop();
 

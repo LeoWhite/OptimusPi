@@ -7,6 +7,7 @@
 #ifndef _PIWARS_THOUGHT_PROCESS_H
 #define _PIWARS_THOUGHT_PROCESS_H
 
+#include <atomic>
 #include <cstdint>
 #include <cstddef>
 #include <unistd.h>
@@ -43,10 +44,7 @@ class ThoughtProcess {
     virtual bool prepare() = 0;
     
     // Run the main 'ThoughtProcess' loop
-    virtual void run() = 0;
-    
-    // Force the ThoughtProcess to stop
-    virtual void stop() = 0;
+    virtual void run(std::atomic<bool> &running) = 0;
 
   protected:
     PiWars *robot() { return _robot; }

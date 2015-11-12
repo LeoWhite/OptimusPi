@@ -71,8 +71,7 @@ bool ThoughtProcess_Manual::prepare() {
   return prepared;
 }
 
-void ThoughtProcess_Manual::run() {
-  bool running = true;
+void ThoughtProcess_Manual::run(std::atomic<bool> &running) {
   struct pollfd fds[2];
   float leftMotor = 0.0, rightMotor = 0.0;
   
@@ -81,7 +80,7 @@ void ThoughtProcess_Manual::run() {
   fds[0].events = POLLIN;
   fds[0].revents = 0;
       
-  while(int result = poll(fds, 1, -1) && running) {
+  while(int result = poll(fds, 1, -1) && running.load()) {
     // Something went wrong (FD got closed, device was removed)
     // so we simply exit out
     if(-1 == result) {
@@ -129,9 +128,6 @@ void ThoughtProcess_Manual::run() {
   
   std::cout << "Releasing joystick" << std::endl;
   _joystick->release();
-}
-
-void ThoughtProcess_Manual::stop() {
 }
 
 }

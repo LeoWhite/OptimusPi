@@ -9,8 +9,10 @@
 #ifndef _PIWARS_BRAINS_H
 #define _PIWARS_BRAINS_H
 
+#include <atomic>
 #include <algorithm>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "ThoughtProcess.h"
@@ -24,6 +26,7 @@ namespace PiWars
   {
     public:
       Brains(); 
+      ~Brains();
       
       // Adds a ThoughtProcess that can then be selected and
       // controlled by the Brain
@@ -69,8 +72,13 @@ namespace PiWars
       }
       
     private:
+      void stopCurrentThoughtProcess();
+      static void currentProcessRun(std::atomic<bool> &running, ThoughtProcess::ptr &process);
       ThoughtProcess::vector _processes;
       ThoughtProcess::ptr _currentProcess;      
+      std::thread *_currentProcessThread;
+      std::atomic<bool> _currentProcessRunning; //<! Used to indicate when the thread should exit
+
   };
 }
 #endif
