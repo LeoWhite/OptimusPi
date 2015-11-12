@@ -35,6 +35,8 @@ Raspberry Pi
    - sudo apt-get install libjs-jquery
    - sudo dpkg -i  libevdev-dev_1.3+dfsg-1_armhf.deb
 
+ - Install ArduiPi_OLED library (https://github.com/hallard/ArduiPi_OLED)
+ 
  - Install GCC 4.9 (https://solarianprogrammer.com/2015/01/13/raspberry-pi-raspbian-install-gcc-compile-cpp-14-programs/)
 
  - Install GIT (sudo apt-get install git)
