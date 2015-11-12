@@ -112,6 +112,9 @@ void ThoughtProcess_StraightLine::run(std::atomic<bool> &running) {
  
   robot()->powertrain()->stop();
   
+  // Release the sensor
+  _rtimu->disable();
+
   std::cerr << std::endl << "Done!" << std::endl;
 }
 

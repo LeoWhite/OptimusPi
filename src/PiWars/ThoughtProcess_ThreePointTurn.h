@@ -39,12 +39,12 @@ class ThoughtProcess_ThreePointTurn : public ThoughtProcess {
     // @param heading The heading to maintain from 0 to 360
     // @param backwards If true drive backwards instead of forwards
     // @param seconds The number of seconds to drive for
-    void driveForDuration(const float heading, const bool backwards, const float seconds);
+    void driveForDuration(std::atomic<bool> &running, const float heading, const bool backwards, const float seconds);
   
     // Turns the robot left until it reaches the specified heading
     //
     // @param The target heading from 0-360    
-    void turnLeft(const float heading);
+    void turnLeft(std::atomic<bool> &running, const float heading);
 
     SensorRTIMU *_rtimu; //<! We use the RTIMU for detecting direction
 };

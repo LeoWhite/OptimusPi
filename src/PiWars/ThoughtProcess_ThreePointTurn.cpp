@@ -55,7 +55,7 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   // Start the motors off at 50% so we don't pull too much current when we jump to 66%
   robot()->powertrain()->setPower(0.50, 0.50);
  
-  driveForDuration(heading, false, 2.0);
+  driveForDuration(running, heading, false, 2.0);
   
   // Turn left
   heading = heading - 90;
@@ -65,18 +65,18 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   }
    
   std::cerr << "Turning left to " << heading << std::endl;
-  turnLeft(heading);
+  turnLeft(running, heading);
   
   // Drive forwards again
   
   std::cerr << "forwards" << std::endl;
-  driveForDuration(heading, false, 1.0f);
+  driveForDuration(running, heading, false, 1.0f);
   
   // Drive backwards
-  driveForDuration(heading, true, 2.0f);
+  driveForDuration(running, heading, true, 2.0f);
   
   // Forwards again
-  driveForDuration(heading, false, 1.0f);
+  driveForDuration(running, heading, false, 1.0f);
   
   // Turn left again
   heading = heading - 90;
@@ -85,15 +85,18 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
     heading = 360 + heading;
   }
   
-  turnLeft(heading);
+  turnLeft(running, heading);
 
   // and finally head home
-  driveForDuration(heading, false, 2.0f);
+  driveForDuration(running, heading, false, 2.0f);
 
+  // Release the sensor
+  _rtimu->disable();
+  
   std::cerr << std::endl << "Done!" << std::endl;
 }
 
-void ThoughtProcess_ThreePointTurn::driveForDuration(const float heading, const bool backwards, const float seconds)
+void ThoughtProcess_ThreePointTurn::driveForDuration(std::atomic<bool> &running, const float heading, const bool backwards, const float seconds)
 {
   std::chrono::time_point<std::chrono::system_clock> start, end; 
   float lastPowerLeft = 0.0f, lastPowerRight = 0.0f;
@@ -102,7 +105,7 @@ void ThoughtProcess_ThreePointTurn::driveForDuration(const float heading, const 
   start = std::chrono::system_clock::now();
 
   // Move forwards on the current heading
-  while(true) {
+  while(running.load()) {
     float currentHeading, offset, powerLeft, powerRight;
     float pitch, roll, yaw;
     
@@ -165,10 +168,10 @@ void ThoughtProcess_ThreePointTurn::driveForDuration(const float heading, const 
   robot()->powertrain()->stop();
 }
 
-void ThoughtProcess_ThreePointTurn::turnLeft(const float heading) {
+void ThoughtProcess_ThreePointTurn::turnLeft(std::atomic<bool> &running, const float heading) {
   // Start turning left
   robot()->powertrain()->setPower(-0.50, 0.50);
-  while(true)
+  while(running.load())
   {
     float currentHeading, offset;
     float pitch, roll, yaw;

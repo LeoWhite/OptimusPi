@@ -47,7 +47,7 @@ bool SensorRTIMU::enable() {
 void SensorRTIMU::disable() {
   if(isEnabled()) {
     // Tell the thread to exit
-    _rtimuReaderQuit = false;
+    _rtimuReaderQuit = true;
     
     // and wait for it to do so
     _rtimuReader->join();
@@ -101,6 +101,7 @@ void SensorRTIMU::rtimuReader(std::atomic<bool> &quit, std::atomic<float> &pitch
     }
   }
   
+  std::cerr << "deletting IME!" << std::endl;
   delete imu;
   delete settings;
 }
