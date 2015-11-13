@@ -1,6 +1,11 @@
+/**
+ * The entry point of the programme. Here we initialise the PiWars library
+ * and select the various ThoughtProcesses that we want the robot to be
+ * able to run.
+ */
+ 
 #include <cstdlib>
 #include <iostream>
-#include <poll.h>
 
 #include "OptimusPiConfig.h"
 #include "PiWars.h"
@@ -12,9 +17,9 @@
 #include "ThoughtProcess_ThreePointTurn.h"
 
 int main(int argc,char *argv[]) {
-  std::cout << "Hello World!" << std::endl;
-  std::cout << "Version " << OptimusPi_VERSION_MAJOR << "." << OptimusPi_VERSION_MINOR << std::endl;  
   PiWars::PiWars optimusPi;
+
+  std::cout << "Optimus Pi Version " << OptimusPi_VERSION_MAJOR << "." << OptimusPi_VERSION_MINOR << std::endl;  
 
   // Load the PiWars up with all the ThoughtProcesses we need
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_Manual>(&optimusPi));
@@ -22,35 +27,10 @@ int main(int argc,char *argv[]) {
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_Proximity>(&optimusPi));
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_StraightLine>(&optimusPi));
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_ThreePointTurn>(&optimusPi));
-  
-  // List out all the available processes
-  for(auto n : optimusPi.brains()->processes()) {
-    if(n->available()) {
-      std::cerr << "Process " << n->name() << " is available" << std::endl;
-    }
-  }
-  
-  optimusPi.brains()->forEachThoughtProcess([](PiWars::ThoughtProcess::ptr n)
-    {
-      if(n->available()) { 
-        std::cerr << "Process " << n->name() << " is available" << std::endl;
-      }
-    });
-    
-  optimusPi.run();
-  //optimusPi.brains()->enableThoughtProcess(3);
-  
-/*  std::cout << process->name() << std::endl;
-  
-  while(!process->available()) {
-    std::this_thread::sleep_for (std::chrono::seconds(1));
-  }
 
-  if(process->prepare()) {
-    process->run();
-  }
-  */
-  
+  // Let the robot run!  
+  optimusPi.run();
+
   return EXIT_SUCCESS;
 }
 

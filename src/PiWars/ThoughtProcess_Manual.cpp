@@ -1,3 +1,8 @@
+/**
+ * This ThoughtProcess is responsible for allowing the user
+ * to manally control the robot via a PS3 controller.
+ */
+
 #include <cstdint>
 #include <cstddef>
 #include <unistd.h>
@@ -14,8 +19,10 @@
 
 namespace PiWars {
 
-static std::string joyStickPath = "/dev/input/by-id/usb-Sony_PLAYSTATION_R_3_Controller-event-joystick";
-  
+// The (currently) hardcoded path of the joystick
+// IMPROVE: We should use the InputManager to look this up
+static std::string joyStickPath = "/dev/input/event1";
+
 ThoughtProcess_Manual::ThoughtProcess_Manual(PiWars *robot) : ThoughtProcess(robot), _joystick(nullptr), _inputQueue(nullptr) {
 }
 
@@ -25,7 +32,7 @@ ThoughtProcess_Manual::~ThoughtProcess_Manual() {
     delete _joystick;
     _joystick = nullptr;
   }
-  
+
   if(_inputQueue) {
     delete _inputQueue;
     _inputQueue = nullptr;
@@ -34,32 +41,32 @@ ThoughtProcess_Manual::~ThoughtProcess_Manual() {
 
 const std::string &ThoughtProcess_Manual::name() {
   static std::string name("Manual");
-    
+
   return name;
 }
 
 bool ThoughtProcess_Manual::available() {
   bool available = false;
-  struct stat buffer;   
-  
+  struct stat buffer;
+
   // IMPROVE: We should be dynamically finding a joystick, instead of hardcoding a path
   if(stat(joyStickPath.c_str(), &buffer) == 0) {
     available = true;
   }
-  
+
   return available;
 }
 
 bool ThoughtProcess_Manual::prepare() {
   bool prepared = false;
-  
+
+  // Create the InputDevice, connect up the event queue and claim
+  // the joystick
   _joystick = new InputDevice(joyStickPath);
   _inputQueue = new InputEventQueue();
-  
 
-  // Attach the input event queue
   _joystick->setEventQueue(*_inputQueue);
-  
+
   if(_joystick->claim()) {
     prepared = true;
   }
@@ -67,24 +74,24 @@ bool ThoughtProcess_Manual::prepare() {
     delete _joystick;
     _joystick = nullptr;
   }
-  
+
   return prepared;
 }
 
 void ThoughtProcess_Manual::run(std::atomic<bool> &running) {
   struct pollfd fds[2];
   float leftMotor = 0.0, rightMotor = 0.0;
-  
+
   // Query the file descriptor so we can correctly wait for events
   fds[0].fd = _inputQueue->getFD();
   fds[0].events = POLLIN;
   fds[0].revents = 0;
-      
+
   while(int result = poll(fds, 1, -1) && running.load()) {
     // Something went wrong (FD got closed, device was removed)
     // so we simply exit out
     if(-1 == result) {
-      std::cerr << "ThoughtProcess_Manual: Poll returned error" << std::endl;
+      std::cerr << __func__ << ": Poll returned error" << std::endl;
       break;
     }
     else {
@@ -101,9 +108,9 @@ void ThoughtProcess_Manual::run(std::atomic<bool> &running) {
         // Clear out any queued up input events
         while(!_inputQueue->empty()) {
           _inputQueue->pop(event);
-                        
+
           if(InputEventType::AXIS == event.getType()) {
-            
+
             if(ABS_Y == event.getCode()) {
               // We invert the Y axis
               leftMotor = -(event.getAxisValue());
@@ -119,14 +126,13 @@ void ThoughtProcess_Manual::run(std::atomic<bool> &running) {
       }
 
       if(updateMotor) {
-        robot()->powertrain()->setPower(leftMotor, rightMotor);  
+        robot()->powertrain()->setPower(leftMotor, rightMotor);
       }
     }
   }
 
+  // Ensure the robot is stopped, and release the joystick
   robot()->powertrain()->stop();
-  
-  std::cout << "Releasing joystick" << std::endl;
   _joystick->release();
 }
 

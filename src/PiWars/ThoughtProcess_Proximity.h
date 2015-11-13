@@ -19,16 +19,12 @@ class ThoughtProcess_Proximity : public ThoughtProcess {
   public:
     ThoughtProcess_Proximity(PiWars *robot);
     ~ThoughtProcess_Proximity();
-    
-    const std::string &name();
 
+    // Implementation of the virtual APIs
+    const std::string &name();
     bool available();
-    
     bool prepare();
-    
     void run(std::atomic<bool> &running);
-    
-    void stop();
 
   private:
     SensorVL6180 *_vl6180; //<! We use a VL6180 for range detection

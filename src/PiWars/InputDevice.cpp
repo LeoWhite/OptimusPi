@@ -1,3 +1,9 @@
+/**
+ * Represents the various Input Devices
+ *
+ * Kernel Input event information https://www.kernel.org/doc/Documentation/input/event-codes.txt
+ */
+
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -29,8 +35,7 @@ InputDevice::InputDevice(std::string &filePath) :
   }
 }
 
-InputDevice::~InputDevice()
-{
+InputDevice::~InputDevice() {
   // Ensure that the device has been release
   release();
 
@@ -101,7 +106,7 @@ void InputDevice::release() {
 }
 
 void InputDevice::populateInfo(void) {
-  // Read in the name
+  // Read in the name of the device
   _name = libevdev_get_name(_evdev);
 
   // Count the number of axes present
@@ -117,7 +122,6 @@ void InputDevice::populateInfo(void) {
       _numButtons++;
     }
   }
-
 }
 
 void InputDevice::setEventQueue(InputEventQueue &queue) {
@@ -142,12 +146,11 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD, InputE
   fds[1].events = POLLIN;
   fds[1].revents = 0;
 
-
   while(int result = poll(fds, 2, -1)) {
     // Something went wrong (FD got closed, device was removed)
     // so we simply exit out
     if(-1 == result) {
-      std::cerr << "Poll returned error" << std::endl;
+      std::cerr << __func__ << ":Poll returned error" << std::endl;
       return;
     }
     else {
@@ -176,12 +179,12 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD, InputE
           // We're dropping events!
     			if(LIBEVDEV_READ_STATUS_SYNC == rc) {
     			  // IMPROVE: we should re-sync here
-    				std::cout <<  "Error: cannot keep up\n" << std::endl;
+    				std::cerr << __func__ <<  ": Cannot keep up with input\n" << std::endl;
     			}
     			// An error occured when reading from the FD, maybe it was closed
     			// or the device removed
     			else if (rc != -EAGAIN && rc < 0) {
-    				std::cout << "Error: " << (-rc) << std::endl;
+    				std::cerr << __func__ << ": Error: " << (-rc) << std::endl;
     				return;
     			}
     			// We've actually read something!
@@ -191,7 +194,7 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD, InputE
         } while (rc != -EAGAIN);
       }
       else {
-        std::cout << "Unknown event" << std::endl;
+        std::cerr  << __func__ << "Unknown event" << std::endl;
       }
     }
   }
@@ -199,7 +202,7 @@ void InputDevice::processEvents(struct libevdev *evdev, int processingFD, InputE
 
 void InputDevice::handleEvent(struct input_event *event, InputEventQueue *queue) {
   InputEvent *inputEvent = nullptr;
-  
+
   // Is it a key code?
   if(libevdev_event_is_type(event, EV_KEY)) {
     inputEvent = new InputEvent(event->code, event->value);
@@ -207,15 +210,14 @@ void InputDevice::handleEvent(struct input_event *event, InputEventQueue *queue)
   else if(libevdev_event_is_type(event, EV_ABS)) {
     // Normalise the axis into the range -1 to 1
     float axisValue = (-1.0 + (2.0/255.0)* event->value);
-    
+
     inputEvent = new InputEvent(event->code, axisValue);
   }
-  
+
   // Did we get an input event?
   if(nullptr != inputEvent && nullptr != queue) {
     queue->push(*inputEvent);
   }
 }
-  
 
 }

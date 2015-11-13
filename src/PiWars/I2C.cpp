@@ -1,3 +1,10 @@
+/**
+ * The I2C class allows for communication with I2C devices connected to the 
+ * Raspberry Pi.
+ *
+ * This is currently implemented using the pigpio library
+ */
+
 #include "I2C.h"
 #include <mutex>
 
@@ -11,11 +18,13 @@ extern "C" {
 #include <sstream>
 #include "string.h"
 
-#define SDA_PIN 5
-#define SDL_PIN 6
-
 namespace PiWars
 {
+
+// The GPIO pins to use for the 'External' I2C bus
+const static uint32_t SDA_PIN = 5;
+const static uint32_t SDL_PIN = 6;
+
 
 std::once_flag initPIGPIODFlag;
   
@@ -50,15 +59,13 @@ void I2C::initPIGPIOD() {
 }
 
 void I2C::finalizePIGPIOD() {
-std::cerr << "Finalize PIGPIOS" << std::endl;
-
+  // IMPROVE: We should also make sure that any i2c handles are closed
   bb_i2c_close(SDA_PIN);
   pigpio_stop();
 }
 
 
 I2CInternal::I2CInternal(uint8_t i2cAddress) : I2C(i2cAddress), _i2cHandle(-1) {
-  // Establish a handle to talk to the i2c device
   _i2cHandle = i2c_open(1, address(), 0);
 }
 
@@ -67,13 +74,15 @@ I2CInternal::~I2CInternal() {
 }
 
 bool I2CInternal::writeBytes(const char *bytes, size_t length) {
-  bool result = true;
+  bool result = false;
   
-  if(i2c_write_device(_i2cHandle, (char *)bytes, length) < 0 ) {
-    std::cerr << "Failed to send message!" << std::endl;
-    result = false;
+  if(i2c_write_device(_i2cHandle, (char *)bytes, length) >= 0 ) {
+    result = true;
   }  
-  
+  else {
+    std::cerr << "Failed to write I2C bytes!" << std::endl;
+  }
+    
   return result;
 }
 
@@ -82,9 +91,9 @@ size_t I2CInternal::readBytes(char *buffer, size_t length) {
   
   read = i2c_read_device(_i2cHandle, buffer, length);
   
-  // Did we fail?
   if(read < 0) {
     // Set to 0 for now
+    // IMPROVE: Should we throw an error?
     read = 0;
   }
   
@@ -94,6 +103,9 @@ size_t I2CInternal::readBytes(char *buffer, size_t length) {
 bool I2CInternal::writeByte(const uint8_t byte) {  
   if(i2c_write_byte(_i2cHandle, byte) >= 0) {
     return true;
+  }
+  else {
+    std::cerr << "Failed to write I2C byte!" << std::endl;
   }
   
   return false;
@@ -119,6 +131,8 @@ I2CExternal::~I2CExternal() {
 
 bool I2CExternal::writeByte(const uint8_t byte) {  
   bool success = false;
+  
+  // Set Address, address, Start, Write, 1 byte, Stop, End 
   char command[] = { 0x04, address(), 0x02, 0x07, 0x01, byte, 0x03, 0x00};
   
   if(0 == bb_i2c_zip(SDA_PIN, command, sizeof(command), NULL, 0)) {
@@ -152,10 +166,10 @@ bool I2CExternal::writeBytes(const char *bytes, size_t length) {
   }
   
   command[commandLength++] = 0x04; // Set address
-  command[commandLength++] = address();
+  command[commandLength++] = address(); // The address
   command[commandLength++] = 0x02; // Start
   command[commandLength++] = 0x07; // Write
-  command[commandLength++] = length; // umber of bytes
+  command[commandLength++] = length; // Number of bytes
   
   // Copy the bytes to send
   memcpy(&command[commandLength], bytes,length);
@@ -172,7 +186,7 @@ bool I2CExternal::writeBytes(const char *bytes, size_t length) {
 }
 
 size_t I2CExternal::readBytes(char *buffer, size_t length) {
-  // Set Address, address, Start, Read, lengt, Stop, End 
+  // Set Address, address, Start, Read, length, Stop, End 
   char command[] = { 0x04, address(), 0x02, 0x06, (char)length, 0x03, 0x00};
   size_t read = 0;
   
@@ -180,6 +194,7 @@ size_t I2CExternal::readBytes(char *buffer, size_t length) {
     return false;
   }
   
+  // Check if we read all the requested bytes
   if(length == bb_i2c_zip(SDA_PIN, command, sizeof(command), buffer, length)) {
     read = length;
   }

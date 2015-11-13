@@ -1,3 +1,11 @@
+/**
+ * The Brains of the robot keeps track of what activities its able
+ * to do, and what activity is currently in progress.
+ *
+ * In future it may get extended to allow multiple activies (e.g. performing 
+ * collision detection when other activities are enabled)
+ */
+
 #include <limits>
 #include "Brains.h"
 #include "Menu.h"
@@ -8,6 +16,7 @@
 namespace PiWars
 {
 
+// Static declarations for the menu
 static std::string menuItemStop = "Stop";
 
 Brains::Brains() 
@@ -15,7 +24,6 @@ Brains::Brains()
   , _currentProcessThread(nullptr)
   , _currentProcessRunning(false)
 {
-
 }
 
 Brains::~Brains() {
@@ -29,7 +37,22 @@ void Brains::addThoughtProcess(ThoughtProcess::ptr thoughtProcess) {
   _processes.push_back(thoughtProcess);
 }
 
+const std::string Brains::currentThoughtProcess() const {
+  static const std::string empty = "";
+
+  // Is there a process currently selected?
+  if(_currentProcess) {
+    return _currentProcess->name();
+  }
+  // If no, return the emptry string
+  else {
+    return empty;
+  }  
+}
+
 Menu *Brains::menu() {
+  // We create a new menu each time to ensure it
+  // has most uptodate information
   Menu *menu = new Menu();
   
   // Do we have an 'active' process?
@@ -38,7 +61,7 @@ Menu *Brains::menu() {
     menu->add(new MenuItem(menuItemStop));
   }
   
-  // List out all the available processes
+  // Add all the currently available processes
   for(auto n : _processes) {
     if(n->available()) {
       menu->add(new MenuItem(n->name()));
@@ -53,7 +76,7 @@ void Brains::selectMenuEntry(const std::string &entry) {
   if(0 == entry.compare(menuItemStop)) {
     stopCurrentThoughtProcess();
   }
-  // Check through the list of processes
+  // Run through the list of processes
   else {
     for(auto n : _processes) {
       // Does it match?
@@ -71,6 +94,7 @@ bool Brains::enableThoughtProcess(std::size_t process) {
   
   // Is it a valid offset? And is it active?
   if(process < _processes.size() && _processes[process]->available()) {
+    // Pass through to enable
     enabled = enableThoughtProcess(_processes[process]);
   }
   
@@ -85,12 +109,12 @@ bool Brains::enableThoughtProcess(ThoughtProcess::ptr process) {
     // Do we have an existing process to tidy up?
     stopCurrentThoughtProcess();
     
-    // Select the processes
+    // Select this as the current process
     _currentProcess = process;
     
-    std::cerr << "Enabling process " << _currentProcess->name() << std::endl;
-      
+    // Prepare the process    
     if(_currentProcess->prepare()) {
+      // and set it off running in a background thread, so it doesn't block this one
       _currentProcessRunning = true;
       _currentProcessThread = new std::thread(currentProcessRun, std::ref(_currentProcessRunning), std::ref(_currentProcess));
       enabled = true;
@@ -119,6 +143,7 @@ void Brains::stopCurrentThoughtProcess() {
 }
 
 void Brains::currentProcessRun(std::atomic<bool> &running, ThoughtProcess::ptr &process) {
+  // Just run the through process, safely in this thread
   process->run(running);
 }
 

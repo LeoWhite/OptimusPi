@@ -9,18 +9,15 @@ namespace PiWars {
 
   class InputDevice;
 
-  /**
-   * The InputManager maintains a list of all currently available
-   * Input devices detected, updating it dynamically as devices are
-   * added or removed
-   */
-
+  // The InputManager maintains a list of all currently available
+  // Input devices detected, updating it dynamically as devices are
+  // added or removed
+  //
   class InputManager {
     public:
+      // Not currently IMPLEMENTED!
       InputManager();
       ~InputManager();
-
-
   };
 }
 

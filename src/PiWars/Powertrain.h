@@ -2,7 +2,7 @@
  * The Powertrain represents the Engine, gearbox, drive and wheels of the robot.
  * Altogether this allows the robot to be driven around and moved.
  */
- 
+
 #ifndef _PIWARS_POWERTRAIN_H
 #define _PIWARS_POWERTRAIN_H
 
@@ -13,7 +13,7 @@ namespace PiWars {
   // Forward declaration
   class InputDevice;
 
-  // An Engine represents one or more motors with the ability to turn
+  // A Powertrain represents one or more motors with the ability to turn
   // left or right, either via tank track driving, or with a steering column.
   class Powertrain : public I2CExternal {
     public:
@@ -32,6 +32,9 @@ namespace PiWars {
       bool setPower(float left, float right);
 
       // Get the current power levels
+      //
+      // @param left Filled in with the power for the 'left' motor
+      // @param right Filled in with the power for the 'right' motor
       void getPower(float &left, float &right);
 
       // Sets the maximum amount of power that should be applied
@@ -41,6 +44,8 @@ namespace PiWars {
       // e.g. if the limiter is set to '0.5' then a power level
       // of '1.0' will be reduced to '0.5' and a power level
       // of '0.5' will be reduced to '0.25'
+      //
+      // @param limiter The new limiter value
       //
       // @returns true if limiter was set
       //          false if limiter range is invalid
@@ -60,8 +65,8 @@ namespace PiWars {
     private:
       float _powerLeft; //!< Amount of power to apply to the left motor
       float _powerRight; //!< Amount of power to apply to the right motor
-      
-      float _powerLimiter; //!< What to limit the power
+
+      float _powerLimiter; //!< What to limit the power range to
   };
 
 }

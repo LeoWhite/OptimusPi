@@ -31,54 +31,63 @@ namespace PiWars
       // Adds a ThoughtProcess that can then be selected and
       // controlled by the Brain
       // 
-      // @param thoughtProcess The process to add, the Brain will take control of it
+      // @param thoughtProcess The process to add
       void addThoughtProcess(ThoughtProcess::ptr thoughtProcess);
       
-      // Enables the specified through process
-      // @param The thought process to enable
+      // Enables the specified ThoughtProcess
       //
+      // @param process The thought process to enable
       // @returns true if the process was enabled
-      //          false otherwise (Process isn't available)
+      //          false otherwise (e.g. Process isn't available)
       bool enableThoughtProcess(ThoughtProcess::ptr process);
       
-      // Enables the specified through process
-      // @param Index of the thought process to enable
+      // Enables the specified ThoughtProcess
+      //
+      // @param process Index of the thought process to enable
       //
       // @returns true if the process was enabled
       //          false otherwise (Process isn't available)
       bool enableThoughtProcess(std::size_t process);
       
-      // Returns a menu containing all the active through processes
+      // Queries the name of the current process (if any)
+      //
+      // @returns The name of the currently running process
+      const std::string currentThoughtProcess() const;
+
+      // Returns a menu containing all the currently avaiable
+      // ThoughtProcesses
+      //
       // @returns A populated menu
       Menu *menu();
 
       // Selects the specific menu entry name, triggering
       // any related actions associated to it.
       //
-      // @param The name of the menu entry that has been selected
+      // @param entry The name of the menu entry that has been selected
       void selectMenuEntry(const std::string &entry);
 
       // Returns the vector of Processess to allow
-      // iteration through it
+      // iteration through them
       //
       // @returns the vector of known processes
-      template <class F>
-      void forEachThoughtProcess(F f) const
-      {
-        std::for_each(begin(_processes), end(_processes), f);
-      }
       const ThoughtProcess::vector &processes() {
         return _processes;
       }
       
     private:
+      // Tell the current ThoughtProcess (if any) to stop, and
+      // waits for it to finish
       void stopCurrentThoughtProcess();
+      
+      // The thread function that the current process will run inside to
+      // avoid it blocking the main thread, and to avoid the ThreadProcess's
+      // having to implement their own threads.
       static void currentProcessRun(std::atomic<bool> &running, ThoughtProcess::ptr &process);
-      ThoughtProcess::vector _processes;
-      ThoughtProcess::ptr _currentProcess;      
-      std::thread *_currentProcessThread;
-      std::atomic<bool> _currentProcessRunning; //<! Used to indicate when the thread should exit
-
+        
+      ThoughtProcess::vector _processes; //<! All the selectable ThoughtProcesses
+      ThoughtProcess::ptr _currentProcess; //<! The currently running ThoughtProcess (if any)
+      std::thread *_currentProcessThread; //<! The thread for the current process
+      std::atomic<bool> _currentProcessRunning; //<! Used to indicate when the currentProcess should exit
   };
 }
 #endif

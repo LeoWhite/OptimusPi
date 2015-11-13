@@ -2,7 +2,7 @@
  * Defines a Menu that can be output on the Display for users
  * to interact with.
  */
- 
+
 #ifndef _PIWARS_MENU_H
 #define _PIWARS_MENU_H
 
@@ -10,53 +10,47 @@
 #include <memory>
 #include <vector>
 
+// Fordwared declare classes
 class ArduiPi_OLED;
+
 namespace PiWars
 {
   class Menu;
-  
+
+  // Represents a single menu entry in the menu
   class MenuItem {
     public:
+      // Creates a MenuItem with the specified name
+      //
+      // @param name The name of this MenuItem that will be displayed in the menu
       MenuItem(const std::string &name);
-      
+
+      // Returns the name of this MenuItem
+      //
+      // @returns The name
       const std::string &name() { return _name; }
-      
+
     protected:
-      std::string _name;        
+      std::string _name; //<! The stored name of this menu entry
   };
 
-  class MenuItemSubMenu : public MenuItem {
-    public:
-      MenuItemSubMenu(const std::string &name,  Menu *menu, const Menu *parent);
-      
-    private:
-      const Menu *_parent;
-      Menu *_menu;
-  };
-
-  class MenuItemValue : public MenuItem {
-    public:
-      MenuItemValue(const std::string &name,  const int32_t value);
-      
-      int32_t value() { return _value; }
-      
-    private:
-      int32_t _value;
-  };
-  
+  // Represents a Menu, which is a list of 0 or more MenuItems
   class Menu
   {
     public:
-      Menu(); 
+      Menu();
 
-      // Add an entry
+      // Add an entry to the menu
+      //
+      // @param item The MenuItem to add
       void add(MenuItem *item);
-      
-      // Update the menu to reflect any 'dynamic' information
-      void update();
 
       // Render the menu to the display at the specified offset.
-      // We will always draw two lines of information.
+      // The menu will always draw two lines of information.
+      //
+      // @param display The display to render the menu on
+      // @param yOffset The yOffset to start rendering at
+      // @param width   The width of the display
       void render(ArduiPi_OLED *display, uint32_t yOffset, uint32_t width);
 
       // Makes the next entry in the menu the active one
@@ -65,12 +59,15 @@ namespace PiWars
       // Makes the previous entry in the menu the active one
       void previous();
 
-      // Returns the name of the current menu entry
+      // Gets the name of the current menu entry
+      //
+      // @returns the name of the current MenuItem
+      //          or an empty string if no MenuItems
       const std::string &current();
-        
+
     private:
-      std::vector<MenuItem *> _entries;
-      uint32_t                _currentEntry;
+      std::vector<MenuItem *> _entries; //<! Contains all the MenuItems in this menu
+      uint32_t _currentEntry; //<! Indicates the currently selected entry
   };
 }
 #endif

@@ -1,5 +1,5 @@
 /**
- * The SensorQTR8RC class initialises and controls access to 
+ * The SensorQTR8RC class initialises and controls access to
  * the SparkFun VL6180 Range sensor.
  * https://cdn.sparkfun.com/assets/learn_tutorials/2/5/7/VL6180_ApplicationNote.pdf
  */
@@ -34,15 +34,20 @@ class SensorQTR8RC : public Sensor, public I2CExternal {
     // Some sensors use additional power or CPU resources
     // when running, so we only want to enable them when
     // we're ready to use them
+    //
     // @returns true if successfully enabled
     bool enable();
 
     // Disable a sensor, potentially reducing power or CPU usage
     void disable();
-   
+
     // Returns the current sensor reading and position
     //
-
+    // @param sensorDiff Filled in with the reading of each sensor
+    // @param positoin Filled in with an estimate of where the line is
+    //
+    // @returns True if sensor results read in
+    //          false otherwise
     bool readLine(uint16_t (&sensorDiff)[8], uint16_t &position);
 
   private:

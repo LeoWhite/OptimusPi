@@ -1,4 +1,6 @@
 /**
+ * This Sensor interfaces with the RTIMU library to read
+ * in sensor details from the connected SenseHAT
  */
 
 #ifndef _PIWARS_SENSORRTIMU_H
@@ -28,20 +30,21 @@ class SensorRTIMU : public Sensor {
     bool exists();
 
     // Enables the sensor ready for use.
-    // Some sensors use additional power or CPU resources
-    // when running, so we only want to enable them when
-    // we're ready to use them
+    // This starts a background thread to constantly read in and update
+    // the sensor results
+    //
     // @returns true if successfully enabled
     bool enable();
 
-    // Disable a sensor, potentially reducing power or CPU usage
+    // Disable the sensor, requesting the background thread
+    // to exit and waiting for it to finish
     void disable();
-   
+
     // Returns the current values
     //
     // @param pitch Filled in with the current pitch
     // @param roll  Filled in with the current roll
-    // @param yaw   Filled in wit the current yaw
+    // @param yaw   Filled in with the current yaw
     void fusion(float &pitch, float &roll, float &yaw);
 
   private:
@@ -52,7 +55,7 @@ class SensorRTIMU : public Sensor {
     std::atomic<float> _pitch; //<! The last successfully read in pitch.
     std::atomic<float> _roll; //<! The last successfully read in roll.
     std::atomic<float> _yaw; //<! The last successfully read in yaw.
-      
+
     std::thread *_rtimuReader; //<! Background thread for reading in the values
     std::atomic<bool> _rtimuReaderQuit; //<! Used to indicate when the thread should exit
 };

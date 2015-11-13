@@ -16,20 +16,16 @@ class ThoughtProcess_Manual : public ThoughtProcess {
   public:
     ThoughtProcess_Manual(PiWars *robot);
     ~ThoughtProcess_Manual();
-    
-    const std::string &name();
 
+    // Implementation of the virtual APIs
+    const std::string &name();
     bool available();
-    
     bool prepare();
-    
     void run(std::atomic<bool> &running);
-    
-    void stop();
 
   private:
-    InputDevice *_joystick;
-    InputEventQueue *_inputQueue;
+    InputDevice *_joystick; //<! The InputDevice that is controlling the robot
+    InputEventQueue *_inputQueue; //<! InputQueue used to buffer incoming input
 };
 
 }

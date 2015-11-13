@@ -18,16 +18,12 @@ class ThoughtProcess_LineFollower : public ThoughtProcess {
   public:
     ThoughtProcess_LineFollower(PiWars *robot);
     ~ThoughtProcess_LineFollower();
-    
-    const std::string &name();
 
+    // Implementation of the virtual APIs
+    const std::string &name();
     bool available();
-    
     bool prepare();
-    
     void run(std::atomic<bool> &running);
-    
-    void stop();
 
   private:
     SensorQTR8RC *_qtr8rc; //<! We use the QTR8RC for sensing the line

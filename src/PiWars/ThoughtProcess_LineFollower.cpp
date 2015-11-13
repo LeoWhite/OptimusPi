@@ -1,3 +1,9 @@
+/**
+ * This ThoughtProcess is responsible for guiding the robot through
+ * the Line following challenge as defined at
+ * http://piwars.org/2015-competition/challenges/line-follower/
+ */
+
 #include <cstdint>
 #include <cstddef>
 #include <unistd.h>
@@ -24,11 +30,13 @@ ThoughtProcess_LineFollower::~ThoughtProcess_LineFollower() {
 
 const std::string &ThoughtProcess_LineFollower::name() {
   static std::string name("LineFollower");
-    
+
   return name;
 }
 
 bool ThoughtProcess_LineFollower::available() {
+  // The QTR8RC Sensor must be connected for this ThoughtProcess
+  // to run
   return _qtr8rc->exists();
 }
 
@@ -43,56 +51,19 @@ void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
     uint16_t sensorDiff[8] = {0};
     uint16_t position;
     float powerLeft, powerRight;
-    
+
+    // Read in the sensor details
     if(_qtr8rc->readLine(sensorDiff, position)) {
       std::cout << "Sensor result ";
-        
+
       for(size_t i = 0; i < 8; i++) {
         std::cout << (uint32_t)sensorDiff[i] << ":";
       }
-      
+
       std::cout << " = " << position <<std::endl;
-    
-#if 0 
-      // Are we over the line
-      if(position <= 100) {
-        // Line is very far to the left.
-        powerLeft = 0.20;
-        powerRight = 0.60;       
-      }
-      else if(position <= 2000) {
-        // Line is far to the left.
-        powerLeft = 0.30;
-        powerRight = 0.50;       
-      }
-      else if(position <= 3000) {
-        // Line is slightly to the left.
-        powerLeft = 0.30;
-        powerRight = 0.40;       
-      }
-      else if(position <= 4000) {
-        // Line is under the sensor
-        powerLeft = 0.30;
-        powerRight = 0.30;       
-      }
-      else if(position <= 5000) {
-        // Line is slightly to the right
-        powerLeft = 0.40;
-        powerRight = 0.30;              
-      }
-      else if(position <= 6000) {
-        // Line is far to the right
-        powerLeft = 0.50;
-        powerRight = 0.30;       
-      }
-      else  {
-        // Line is very far to the right
-        powerLeft = 0.60;
-        powerRight = 0.20;       
-      }
-#endif
 
       // Very simple implemenation
+      // IMPROVE: Need a more complete algorithm here
       if(position <= 3000) {
         // Need to turn left
         powerLeft = -0.35;
@@ -107,29 +78,31 @@ void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
         powerLeft = 0.35;
         powerRight = -0.35;
       }
-      
+
       // Set the motors
       if(lastPowerLeft != powerLeft || lastPowerRight != powerRight) {
+        // As the sensor is currenlty mounted on the back of the robot, and
+        // we are going backwards... swap the values around
         float temp = powerLeft;
-
-        // As we are going backwards... swap the values around
         powerLeft = -powerRight;
-        powerRight = -temp; 
+        powerRight = -temp;
+
         robot()->powertrain()->setPower(powerLeft, powerRight);
-        std::cerr << "setting power to " << powerLeft << ":" << powerRight << std::endl;
+
         lastPowerLeft = powerLeft;
         lastPowerRight = powerRight;
-      } 
+      }
 
       // Let the robot actually move
       std::this_thread::sleep_for (std::chrono::microseconds(200));
-      
+
     }
     else {
-      std::cerr << "Failed to read in sensor deatsils" << std::endl;
+      std::cerr << __func__ << ": Failed to read in sensor details" << std::endl;
     }
   }
- 
+
+  // Ensure the motors are stopped
   robot()->powertrain()->stop();
 }
 

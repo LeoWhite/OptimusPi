@@ -1,3 +1,11 @@
+/**
+ * This ThoughtProcess is responsible for controlling the robot
+ * as it attempts the complete the Proximity alert challenge
+ * http://piwars.org/2015-competition/challenges/proximity-alert/
+ *
+ * Currently we make use of the VL6180 sensor for range detection.
+ */
+
 #include <cstdint>
 #include <cstddef>
 #include <unistd.h>
@@ -11,7 +19,7 @@
 
 namespace PiWars {
 
-  
+
 ThoughtProcess_Proximity::ThoughtProcess_Proximity(PiWars *robot) : ThoughtProcess(robot), _vl6180(new SensorVL6180()) {
 }
 
@@ -25,7 +33,7 @@ ThoughtProcess_Proximity::~ThoughtProcess_Proximity() {
 
 const std::string &ThoughtProcess_Proximity::name() {
   static std::string name("Proximity");
-    
+
   return name;
 }
 
@@ -41,23 +49,26 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
   float lastPower = -1.0;
 
   while(running.load()) {
+    // Read in the current range
     uint8_t range = _vl6180->range();
     float power = 0.0;
 
+    // Less than 20mm, so stop now (It takes some distance to stop)
     if(range <= 20) {
-      std::cerr << "Stopping" << std::endl;
       // Stop!
       power = 0.0;
 
       // and we've completed
       running = false;
     }
+    // Within 50mm
     else if(range < 50) {
-      // getting closer
+      // getting closer, start to slow down
       power = 0.18;
     }
+    // 50-100mm
     else if(range < 100) {
-      // Drop to quarter
+      // Drop to quarter speed
       power = 0.30;
     }
     // Long way to go yet!
@@ -69,14 +80,14 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
     // Set the motors
     if(lastPower != power) {
       robot()->powertrain()->setPower(power, power);
-      std::cerr << "Range is " << (int)range << "mm setting power to " << power << std::endl;
       lastPower = power;
-    } 
+    }
 
     // Let the robot actually move
     std::this_thread::sleep_for (std::chrono::microseconds(10));
   }
- 
+
+  // Stop the robot, hopefully close to the wall!
   robot()->powertrain()->stop();
 }
 

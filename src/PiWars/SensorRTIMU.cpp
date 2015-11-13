@@ -7,15 +7,15 @@
 namespace PiWars
 {
 
-  
-SensorRTIMU::SensorRTIMU() 
+
+SensorRTIMU::SensorRTIMU()
   : Sensor()
   , _initialised(false)
   , _pitch(0)
   , _roll(0)
   , _yaw(0)
   , _rtimuReader(nullptr)
-  , _rtimuReaderQuit(false) 
+  , _rtimuReaderQuit(false)
 {
 }
 
@@ -34,25 +34,25 @@ bool SensorRTIMU::enable() {
     // range ready to be read.
     _rtimuReaderQuit = false;
     _rtimuReader = new std::thread(rtimuReader, std::ref(_rtimuReaderQuit), std::ref(_pitch), std::ref(_roll), std::ref(_yaw));
-    
-    // Call the base class to perform any 
+
+    // Call the base class to perform any
     // generic changes
     Sensor::enable();
   }
-  
+
   return isEnabled();
-    
+
 }
 
 void SensorRTIMU::disable() {
   if(isEnabled()) {
     // Tell the thread to exit
     _rtimuReaderQuit = true;
-    
+
     // and wait for it to do so
     _rtimuReader->join();
-    _rtimuReader = nullptr;    
-    
+    _rtimuReader = nullptr;
+
     Sensor::disable();
   }
 }
@@ -62,34 +62,31 @@ void SensorRTIMU::fusion(float &pitch, float &roll, float &yaw) {
   yaw = _yaw;
 }
 
-void SensorRTIMU::rtimuReader(std::atomic<bool> &quit, std::atomic<float> &pitch, std::atomic<float> &roll, std::atomic<float> &yaw) 
+void SensorRTIMU::rtimuReader(std::atomic<bool> &quit, std::atomic<float> &pitch, std::atomic<float> &roll, std::atomic<float> &yaw)
 {
-  // read in the main settings
+  // read in the main settings and create the RTIMU class
   RTIMUSettings *settings = new RTIMUSettings("/etc", "RTIMULib");
-  
   RTIMU *imu = RTIMU::createIMU(settings);
 
   if ((imu == NULL) || (imu->IMUType() == RTIMU_TYPE_NULL)) {
-    std::cerr << "IMU not found!" << std::endl;
-      
+    std::cerr << __func__ << ": IMU not found!" << std::endl;
+
     // Exit out early
     return;
   }
-  
+
   imu->IMUInit();
 
-  //  this is a convenient place to change fusion parameters
-
+  // Use the recommended values
   imu->setSlerpPower(0.02);
   imu->setGyroEnable(true);
   imu->setAccelEnable(true);
   imu->setCompassEnable(true);
 
-  
   while(!quit.load()) {
-  
+
     std::this_thread::sleep_for (std::chrono::milliseconds(imu->IMUGetPollInterval()));
-      
+
     if(imu->IMURead()) {
       RTIMU_DATA imuData = imu->getIMUData();
 
@@ -100,15 +97,13 @@ void SensorRTIMU::rtimuReader(std::atomic<bool> &quit, std::atomic<float> &pitch
       }
     }
   }
-  
-  std::cerr << "deletting IME!" << std::endl;
+
   delete imu;
   delete settings;
 }
 
 void SensorRTIMU::init() {
   // Nothing to be done for now
-  
 }
 
 }

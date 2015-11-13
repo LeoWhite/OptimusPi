@@ -1,7 +1,7 @@
 /**
  * This ThoughtProcess is responsible for keeping the robot
- * on a straight line as it attempts the straight line 
- * speed challenge 
+ * on a straight line as it attempts the straight line
+ * speed challenge
  * http://piwars.org/2015-competition/challenges/straight-line-speed-test/
  *
  * Currently we make use of the SenseHAT, via the RTIMU library, to
@@ -21,13 +21,11 @@ class ThoughtProcess_StraightLine : public ThoughtProcess {
   public:
     ThoughtProcess_StraightLine(PiWars *robot);
     ~ThoughtProcess_StraightLine();
-    
-    const std::string &name();
 
+    // Implementation of the virtual APIs
+    const std::string &name();
     bool available();
-    
     bool prepare();
-    
     void run(std::atomic<bool> &running);
 
   private:
