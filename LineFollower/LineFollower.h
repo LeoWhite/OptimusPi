@@ -1,10 +1,8 @@
 
-//------------------------- Define function of each I/O pin -------------------------------------------------
-
 // The pin configurations for the sensor
-#define qtr8RCSensorOne    2 
-#define qtr8RCSensorTwo    3 
-#define qtr8RCSensorThree  4 
+#define qtr8RCSensorOne    2
+#define qtr8RCSensorTwo    3
+#define qtr8RCSensorThree  4
 #define qtr8RCSensorFour   5
 #define qtr8RCSensorFive   6
 #define qtr8RCSensorSix    7

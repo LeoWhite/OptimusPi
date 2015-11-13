@@ -1,10 +1,10 @@
 // This is setup for the Pololu QTR-8RC Reflectance Sensor Array
 // Library is available from https://github.com/pololu/qtr-sensors-arduino
 
-unsigned int sensorValues[qtr8RCSensorCount];
+unsigned int sensorValues[qtr8RCSensorCount]; //<! Where the sensor values are stored
+bool calibrating = false; //<! Flag to indicate if we are currently calibrating
 
-bool calibrating = false;
-
+// The class for accessing the sensor
 QTRSensorsRC qtrrc((unsigned char[]) {qtr8RCSensorOne, qtr8RCSensorTwo, qtr8RCSensorThree, qtr8RCSensorFour, qtr8RCSensorFive, qtr8RCSensorSix,qtr8RCSensorSeven, qtr8RCSensorEight}, qtr8RCSensorCount, qtr8RCTimeout, qtr8RCEmitter);
 
 
@@ -27,18 +27,30 @@ void qtr8RCLoop() {
 }
 
 /**
- * Process the i2c calibrate start command
+ * Process the i2c calibrate start command, resetting any
+ * existing calibration information.
+ *
+ * @param i2cArgs Any arguments passed on i2c
+ * @param pi2cResponse Filled in with the I2C response, if any
+ *
+ * @returns the number of items added to the response
  */
 int qtr8RCCalibrateStart(byte *i2cArgs, uint8_t *pi2cResponse) {
   // reset the calibration information
   qtrrc.resetCalibration();
-  
+
   calibrating = true;
   return 0;
 }
 
 /**
- * Process the i2c calibrate stop command
+ * Process the i2c calibrate stop command, stopping the
+ * calibration process and outputting the values over Serial
+ *
+ * @param i2cArgs Any arguments passed on i2c
+ * @param pi2cResponse Filled in with the I2C response, if any
+ *
+ * @returns the number of items added to the response
  */
 int qtr8RCCalibrateStop(byte *i2cArgs, uint8_t *pi2cResponse) {
   calibrating = false;
@@ -58,15 +70,19 @@ int qtr8RCCalibrateStop(byte *i2cArgs, uint8_t *pi2cResponse) {
   }
   Serial.println();
   Serial.println();
-  
+
   return 0;
 }
 
 /**
- * Process the i2c read sensor command
+ * Process the i2c read sensor command.
+ * Stops any calibration currently in progress and reads in the
+ * current results from the sensor array
  *
- * Takes in the two integers that contain the power levels
- * of the left and right motors
+ * @param i2cArgs Any arguments passed on i2c
+ * @param pi2cResponse Filled in with the I2C response, if any
+ *
+ * @returns the number of items added to the response
  */
 int qtr8RCReadSensor(byte *i2cArgs, uint8_t *pi2cResponse) {
   unsigned int position = qtrrc.readLine(sensorValues);
@@ -74,26 +90,19 @@ int qtr8RCReadSensor(byte *i2cArgs, uint8_t *pi2cResponse) {
 
   if(calibrating) {
     qtr8RCCalibrateStop(i2cArgs, pi2cResponse);
-  
-  }
-  // Convert results to the i2c format
 
-  // print the sensor values as numbers from 0 to 1000, where 0 means maximum reflectance and
-  // 1000 means minimum reflectance, followed by the line position
-  for (unsigned char i = 0; i < qtr8RCSensorCount; i++)
-  {
+  }
+
+  // Convert results to the i2c format
+  for (unsigned char i = 0; i < qtr8RCSensorCount; i++) {
+    // Each result is stored as a 16 bit value
     pi2cResponse[i2cResponseArg++] = highByte(sensorValues[i]);
     pi2cResponse[i2cResponseArg++] = lowByte(sensorValues[i]);
-    //Serial.print(sensorValues[i]);
-    //Serial.print('\t');
   }
 
   // Store the position as a 16 bit value
   pi2cResponse[i2cResponseArg++] = highByte(position);
   pi2cResponse[i2cResponseArg++] = lowByte(position);
-  
-  //Serial.println(); // uncomment this line if you are using raw values
-  //Serial.println(position); // comment this line out if you are using raw values
 
   return i2cResponseArg;
 }
