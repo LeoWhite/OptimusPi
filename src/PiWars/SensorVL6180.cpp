@@ -48,7 +48,7 @@ bool SensorVL6180::enable() {
 void SensorVL6180::disable() {
   if(isEnabled()) {
     // Tell the thread to exit
-    _rangeReaderQuit = false;
+    _rangeReaderQuit = true;
 
     // and wait for it to do so
     _rangeReader->join();

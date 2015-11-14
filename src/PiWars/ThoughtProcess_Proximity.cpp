@@ -89,6 +89,9 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
 
   // Stop the robot, hopefully close to the wall!
   robot()->powertrain()->stop();
+  
+  // Disable the sensor
+  _vl6180->disable();
 }
 
 }
