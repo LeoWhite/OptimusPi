@@ -96,7 +96,7 @@ void I2C_CheckCommands() {
  *
  * @param howMany Number of bytes that arrived
  */
-void receiveData(int howMany){
+void receiveData(int howMany) {
   int cmdRcvd = -1;
   int argIndex = -1;
   int availableBytes = 0;
