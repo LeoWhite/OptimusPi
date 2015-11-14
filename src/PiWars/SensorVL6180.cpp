@@ -59,7 +59,7 @@ void SensorVL6180::disable() {
 }
 
 void SensorVL6180::rangeReader(std::atomic<bool> &quit, std::atomic<uint8_t> &range) {
-  I2CInternal rangeSensor(0x29);
+  I2CExternal rangeSensor(0x29);
 
   while(!quit.load()) {
     uint32_t attempts = 0;
