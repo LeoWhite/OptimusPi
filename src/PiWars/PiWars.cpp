@@ -159,12 +159,10 @@ void PiWars::processButton(const InputEvent &event) {
       }
     }
     else {
-      // The display is position 90 degress to the SenseHAT, so we use
-      // UP and Down instead of Left and Right
-      if(KEY_UP == event.getCode()) {
+      if(KEY_RIGHT == event.getCode()) {
         _currentMenu->next();
       }
-      else if(KEY_DOWN == event.getCode()) {
+      else if(KEY_LEFT == event.getCode()) {
         _currentMenu->previous();
       }
       else if(KEY_ENTER) {

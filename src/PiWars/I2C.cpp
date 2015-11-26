@@ -22,8 +22,8 @@ namespace PiWars
 {
 
 // The GPIO pins to use for the 'External' I2C bus
-const static uint32_t SDA_PIN = 5;
-const static uint32_t SDL_PIN = 6;
+const static uint32_t SDL_PIN = 5;
+const static uint32_t SDA_PIN = 6;
 
 
 std::once_flag initPIGPIODFlag;
