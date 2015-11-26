@@ -23,6 +23,11 @@ void Powertrain::stop() {
     if(!writeBytes((const char *)"\x11", 1)) {
       std::cerr << __func__ << ": Failed to send stop!" << std::endl;
     }
+    else {
+      _powerLeft = 0.0f;
+      _powerRight = 0.0f;    
+    }
+    
   }
 }
 
@@ -56,7 +61,7 @@ bool Powertrain::setPower(float left, float right) {
       else {
         // IMPROVE: Is this necessary? We don't want to flood the I2C
         // bus with too many messages
-        std::this_thread::sleep_for (std::chrono::milliseconds(100));
+        //std::this_thread::sleep_for (std::chrono::milliseconds(100));
 
         result = true;
       }
