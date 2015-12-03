@@ -71,7 +71,7 @@ void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
       }
       else if(position < 4000) {
         // Continue forwards
-        powerLeft = powerRight = 0.25;
+        powerLeft = powerRight = 0.35;
       }
       else {
         // Turn right
@@ -81,29 +81,27 @@ void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
 
       // Set the motors
       if(lastPowerLeft != powerLeft || lastPowerRight != powerRight) {
-        // As the sensor is currenlty mounted on the back of the robot, and
-        // we are going backwards... swap the values around
-        float temp = powerLeft;
-        powerLeft = -powerRight;
-        powerRight = -temp;
 
         robot()->powertrain()->setPower(powerLeft, powerRight);
 
         lastPowerLeft = powerLeft;
         lastPowerRight = powerRight;
       }
-
-      // Let the robot actually move
-      std::this_thread::sleep_for (std::chrono::microseconds(200));
-
     }
     else {
       std::cerr << __func__ << ": Failed to read in sensor details" << std::endl;
     }
+    
+    // Let the robot actually move
+    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    
   }
 
   // Ensure the motors are stopped
   robot()->powertrain()->stop();
+
+  // Release the sensor
+  _qtr8rc->disable();
 }
 
 }
