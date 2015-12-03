@@ -15,6 +15,7 @@
 #include "ThoughtProcess_LineFollower.h"
 #include "ThoughtProcess_StraightLine.h"
 #include "ThoughtProcess_ThreePointTurn.h"
+#include "ThoughtProcess_ThreePointTurnSimple.h"
 
 int main(int argc,char *argv[]) {
   PiWars::PiWars optimusPi;
@@ -27,6 +28,7 @@ int main(int argc,char *argv[]) {
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_Proximity>(&optimusPi));
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_StraightLine>(&optimusPi));
   optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_ThreePointTurn>(&optimusPi));
+  optimusPi.brains()->addThoughtProcess(std::make_shared<PiWars::ThoughtProcess_ThreePointTurnSimple>(&optimusPi));
 
   // Let the robot run!  
   optimusPi.run();
