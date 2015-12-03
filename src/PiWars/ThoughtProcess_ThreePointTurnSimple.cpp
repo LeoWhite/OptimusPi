@@ -104,7 +104,7 @@ void ThoughtProcess_ThreePointTurnSimple::driveForDuration(std::atomic<bool> &ru
     }
 
     // Let the robot actually move
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     end = std::chrono::system_clock::now();
     std::chrono::duration<float> duration = end - start;
@@ -132,7 +132,7 @@ void ThoughtProcess_ThreePointTurnSimple::turnLeft(std::atomic<bool> &running) {
     robot()->powertrain()->setPower(-0.50, 0.50);
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
     
     end = std::chrono::system_clock::now();
     std::chrono::duration<float> duration = end - start;

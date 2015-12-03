@@ -113,7 +113,7 @@ void ThoughtProcess_StraightLine::run(std::atomic<bool> &running) {
     }
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
 
     end = std::chrono::system_clock::now();
     std::chrono::duration<float> duration = end - start;

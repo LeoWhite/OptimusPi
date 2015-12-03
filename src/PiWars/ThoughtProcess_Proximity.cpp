@@ -73,7 +73,7 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
     else {
       // Proceed forwards at half speed
       power = 0.40;
-      sleepTime = 50;
+      sleepTime = 5;
     }
 
     // Set the motors
@@ -85,7 +85,7 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
     }
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(sleepTime));
+    std::this_thread::sleep_for (std::chrono::milliseconds(sleepTime));
   }
 
   // Stop the robot, hopefully close to the wall!
