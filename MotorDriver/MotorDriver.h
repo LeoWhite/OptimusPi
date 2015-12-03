@@ -4,7 +4,7 @@
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 
-#define CURRENT_OVERLOAD_CUTOUT 10000
+#define CURRENT_OVERLOAD_CUTOUT 15000
 
 
 #define pwm1pin   5
