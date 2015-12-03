@@ -66,7 +66,7 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   // Start the motors off at 50% so we don't pull too much current when we jump to 66%
   robot()->powertrain()->setPower(0.50, 0.50);
 
-  driveForDuration(running, heading, false, 2.0);
+  driveForDuration(running, heading, false, 7.5);
 
   // Turn left
   heading = heading - 90;
@@ -81,13 +81,13 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   // Drive forwards again
 
   std::cerr << "forwards" << std::endl;
-  driveForDuration(running, heading, false, 1.0f);
+  driveForDuration(running, heading, false, 1.4f);
 
   // Drive backwards
-  driveForDuration(running, heading, true, 2.0f);
+  driveForDuration(running, heading, true, 3.0f);
 
   // Forwards again
-  driveForDuration(running, heading, false, 1.0f);
+  driveForDuration(running, heading, false, 1.5f);
 
   // Turn left again
   heading = heading - 90;
@@ -99,7 +99,7 @@ void ThoughtProcess_ThreePointTurn::run(std::atomic<bool> &running) {
   turnLeft(running, heading);
 
   // and finally head home
-  driveForDuration(running, heading, false, 2.0f);
+  driveForDuration(running, heading, false, 7.5f);
 
   // Release the sensor
   _rtimu->disable();
