@@ -52,39 +52,40 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
     // Read in the current range
     uint8_t range = _vl6180->range();
     float power = 0.0;
+    uint32_t sleepTime = 100;
 
-    // Less than 20mm, so stop now (It takes some distance to stop)
-    if(range <= 20) {
+    std::cout << "Range = "<< (int) range << std::endl;
+
+    // Time to stop? (It takes some distance to stop)
+    if(range <= 66) {
       // Stop!
       power = 0.0;
 
       // and we've completed
       running = false;
     }
-    // Within 50mm
-    else if(range < 50) {
+    else if(range < 200) {
       // getting closer, start to slow down
-      power = 0.18;
-    }
-    // 50-100mm
-    else if(range < 100) {
-      // Drop to quarter speed
-      power = 0.30;
+      power = 0.15;
+      sleepTime = 1; 
     }
     // Long way to go yet!
     else {
       // Proceed forwards at half speed
-      power = 0.50;
+      power = 0.40;
+      sleepTime = 50;
     }
 
     // Set the motors
     if(lastPower != power) {
-      robot()->powertrain()->setPower(power, power);
+      // Componsate for drift
+      float rightPower = power * 0.95;
+      robot()->powertrain()->setPower(power, rightPower);
       lastPower = power;
     }
 
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::microseconds(10));
+    std::this_thread::sleep_for (std::chrono::microseconds(sleepTime));
   }
 
   // Stop the robot, hopefully close to the wall!
