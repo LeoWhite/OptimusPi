@@ -52,6 +52,9 @@ class PiWars {
     void updateDisplay();
 
   private:
+    // Displays information about the robot on the OLED
+    void displayInfo();
+    
     bool _running; //<! Are we still running?
     Brains *_brains; //<! The 'Brains' of this robot
     Powertrain *_powertrain; //<! The 'PowerTrain' of this robot
@@ -62,6 +65,7 @@ class PiWars {
     std::chrono::time_point<std::chrono::system_clock> _lastInput; //<! When we last processed an Input Event
     Menu *_mainMenu; //<! The PiWars main menu for display
     Menu *_currentMenu; //<! The menu that is currently being displayed/accesed
+    bool _displayingInfo; //<! Are we currently displaying the 'Info' page
 };
 
 }

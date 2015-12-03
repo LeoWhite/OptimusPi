@@ -14,6 +14,14 @@
 #include <sys/poll.h>
 #include <sys/stat.h>
 
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/if_link.h>
 
 // Include last as it defines 'max' and 'min' macros which can break
 // the standard C++ includes
@@ -37,6 +45,7 @@ PiWars::PiWars()
   , _inputQueue(nullptr)
   , _mainMenu(new Menu())
   , _currentMenu(nullptr)
+  , _displayingInfo(false)
 {
   // Ensure the motors are stopped
   _powertrain->stop();
@@ -107,21 +116,22 @@ void PiWars::run() {
     else if(0 == result) {
       // A timeout occured.
 
-      // Do we need to dismiss the menu?
-      if(_currentMenu) {
-        std::chrono::duration<float> duration = std::chrono::system_clock::now() - _lastInput;
+      // Do we need to dismiss the menu or Info?
+      std::chrono::duration<float> duration = std::chrono::system_clock::now() - _lastInput;
 
-        // After 5 seconds of inactivity we dismiss the menu
-        if(duration.count() >= 5.0f) {
-          _currentMenu = nullptr;
-        }
+      // After 5 seconds of inactivity we dismiss the menu
+      if(duration.count() >= 5.0f) {
+
+        // Ensure the meuu and info are dismissed
+        _currentMenu = nullptr;
+        _displayingInfo = false;
       }
 
       // And update the display
       updateDisplay();
     }
     else {
-      // Anyting else should be from the input device
+      // Anything else should be from the input device
       if(fds[0].revents & POLLIN) {
         int rc;
         InputEvent event(0,0);
@@ -156,6 +166,7 @@ void PiWars::processButton(const InputEvent &event) {
       if(KEY_ENTER == event.getCode()) {
         // Display the main menu
         _currentMenu = _mainMenu;
+        _displayingInfo = false;
       }
     }
     else {
@@ -172,10 +183,13 @@ void PiWars::processButton(const InputEvent &event) {
         // Assume the menu will no longer be active after this
         _currentMenu = nullptr;
 
+        // Assume the 'info' window is no longer being displayed
+        _displayingInfo = false;
+
         // Are we on the main menu?
         if(isMainMenu) {
           if(0 == currentEntry.compare(menuItemInfo)) {
-            // TODO: Display IP address, uptime, date etc.
+            _displayingInfo = true;
           }
           else if(0 == currentEntry.compare(menuItemBrains)) {
             // Get the Brains menu and set it as the current menu
@@ -199,13 +213,19 @@ void PiWars::processButton(const InputEvent &event) {
 }
 
 void PiWars::updateDisplay() {
+  // Are we displaying the info panel?
+  if(_displayingInfo) {
+    displayInfo();
+    return;
+  }
+
   _display->clearDisplay();
 
   // Setup the Text size and colour incase its been changed
   _display->setTextSize(1);
   _display->setTextColor(WHITE);
 
-  // Daw the first line
+  // Draw the first line
   _display->setCursor(0,0);
   // TODO: Actually display info such as WiFi, BlueTooth, battery level
   _display->print("Stats\n");
@@ -224,4 +244,57 @@ void PiWars::updateDisplay() {
   _display->display();
 }
 
+void PiWars::displayInfo() {
+  _display->clearDisplay();
+
+  // Setup the Text size and colour incase its been changed
+  _display->setTextSize(1);
+  _display->setTextColor(WHITE);
+
+  // Start from the top left
+  _display->setCursor(0,0);
+
+  // Display the IP addresses (if any)
+  struct ifaddrs *ifaddr;
+
+  if(getifaddrs(&ifaddr) != -1) {
+    static std::string eth0("eth0"), wlan0("wlan0");
+    char host[NI_MAXHOST];
+    struct ifaddrs *ifa;
+
+    /* Walk through linked list, maintaining head pointer so we
+       can free list later */
+    for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+      if(ifa->ifa_addr == NULL) {
+        continue;
+      }
+
+      // Is it an interface we are interested in?
+      if(0 == eth0.compare(ifa->ifa_name) ||
+         0 == wlan0.compare(ifa->ifa_name))
+      {
+        if(ifa->ifa_addr->sa_family == AF_INET) {
+           int s;
+
+           // read in the name infdormation
+           s = getnameinfo(ifa->ifa_addr,
+                    sizeof(struct sockaddr_in),
+                   host, NI_MAXHOST,
+                   NULL, 0, NI_NUMERICHOST);
+           if(0 == s) {
+             _display->print(ifa->ifa_name);
+             _display->print(":");
+             _display->print(host);
+             _display->print("\n");
+           }
+        }
+      }
+    }
+    
+    freeifaddrs(ifaddr);
+  }
+
+  // and update the actual display
+  _display->display();
+}
 }
