@@ -7,6 +7,7 @@
 #define _PIWARS_PIWARS_H
 
 #include <chrono>
+#include <stdio.h>
 
 // Forward declared classes
 class ArduiPi_OLED;
@@ -66,6 +67,9 @@ class PiWars {
     Menu *_mainMenu; //<! The PiWars main menu for display
     Menu *_currentMenu; //<! The menu that is currently being displayed/accesed
     bool _displayingInfo; //<! Are we currently displaying the 'Info' page
+    
+    bool _cameraRecording; //<! Is the camera recording?
+    FILE *_cameraPipe; //<! Pipe to the camera app
 };
 
 }

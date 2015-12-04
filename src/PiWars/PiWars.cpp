@@ -34,6 +34,7 @@ namespace PiWars {
 static std::string fiveWayPath = "/dev/input/event0";
 static std::string menuItemInfo = "Info";
 static std::string menuItemBrains = "Brains";
+static std::string menuItemCamera = "Camera";
 static std::string menuItemShutdown = "Shutdown";
 
 PiWars::PiWars()
@@ -46,6 +47,8 @@ PiWars::PiWars()
   , _mainMenu(new Menu())
   , _currentMenu(nullptr)
   , _displayingInfo(false)
+  , _cameraRecording(false)
+  , _cameraPipe(NULL)
 {
   // Ensure the motors are stopped
   _powertrain->stop();
@@ -62,9 +65,25 @@ PiWars::PiWars()
     exit(-1);
   }
 
+  // Start the camera
+  char outputDir[] = "/home/pi/PiWars.XXXXXX";
+  char *outputDirName = mkdtemp(outputDir);
+  char cmdBuffer[256];
+  
+  sprintf(cmdBuffer, "sudo raspivid --nopreview -w 1296 -h 730 -v -hf -vf -t 0 -k -sp --initial pause -o %s/vid%%0d.h264", outputDirName);
+  std::cout << cmdBuffer << std::endl;
+  
+  // Attempt to launch raspivid
+  _cameraPipe = popen(cmdBuffer, "w");
+  
+  if(!_cameraPipe) {
+    std::cout << "Camera not launch" << std::endl;    
+  }
+  
   // Populate the menu
   _mainMenu->add(new MenuItem(menuItemInfo));
   _mainMenu->add(new MenuItem(menuItemBrains));
+  _mainMenu->add(new MenuItem(menuItemCamera));
   _mainMenu->add(new MenuItem(menuItemShutdown));
 
   // Initialise the display
@@ -84,6 +103,13 @@ PiWars::~PiWars() {
   _display->print("Shutting down\n");
   _display->display();
 
+  // Close camera
+  if(_cameraPipe) {
+    fwrite("x\n", 2, 1, _cameraPipe);
+    pclose(_cameraPipe);
+    _cameraPipe = NULL;
+  }
+  
   // TODO: Either perform a shutdown here, or in a wrapper script (Makes
   // development hard if we actually turn of the Pi every time we run this!
   delete _mainMenu;
@@ -195,6 +221,14 @@ void PiWars::processButton(const InputEvent &event) {
             // Get the Brains menu and set it as the current menu
             _currentMenu = _brains->menu();
           }
+          else if(0 == currentEntry.compare(menuItemCamera)) {
+            // Toggle the camera
+            if(_cameraPipe) {
+              fwrite("\n", 1, 1, _cameraPipe);
+              fflush(_cameraPipe);
+              _cameraRecording = !_cameraRecording;
+            }
+          }
           else if(0 == currentEntry.compare(menuItemShutdown)) {
             _running = false;
           }
@@ -228,8 +262,17 @@ void PiWars::updateDisplay() {
   // Draw the first line
   _display->setCursor(0,0);
   // TODO: Actually display info such as WiFi, BlueTooth, battery level
-  _display->print("Stats\n");
-
+  
+  if(!_cameraPipe) {
+    _display->print("Camera Not Found\n");
+  }
+  else if(_cameraRecording) {
+    _display->print("Camera On\n");
+  }
+  else {
+    _display->print("Camera Off\n");
+  }
+  
   // Display the currently selected process
   _display->setCursor(0,10);
   _display->print("Current:");
