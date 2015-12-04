@@ -46,38 +46,61 @@ bool ThoughtProcess_LineFollower::prepare() {
 
 void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
   float lastPowerLeft = -1.0, lastPowerRight = -1.0;
+  uint16_t position = 0;
 
   while(running.load()) {
     uint16_t sensorDiff[8] = {0};
-    uint16_t position;
     float powerLeft, powerRight;
-
+    uint16_t temp;
+    
     // Read in the sensor details
-    if(_qtr8rc->readLine(sensorDiff, position)) {
-      std::cout << "Sensor result ";
+    if(_qtr8rc->readLine(sensorDiff, temp)) {
+      uint16_t newPosition = 0;
+      
+      // Very simple implemenation
 
       for(size_t i = 0; i < 8; i++) {
-        std::cout << (uint32_t)sensorDiff[i] << ":";
+        if(sensorDiff[i] >= 500) {
+          newPosition |= (1 << i);
+        }
       }
 
-      std::cout << " = " << position <<std::endl;
-
-      // Very simple implemenation
+      if(newPosition) {
+        position = newPosition;
+      }
+      
       // IMPROVE: Need a more complete algorithm here
-      if(position <= 3000) {
-        // Need to turn left
-        powerLeft = -0.35;
+      if(position <= 8) {
+        // Need to turn sharp left
+        powerLeft =  0.0;
         powerRight = 0.35;
       }
-      else if(position < 4000) {
-        // Continue forwards
-        powerLeft = powerRight = 0.35;
+      else if(position < 24) {
+        // Need to turn left
+        powerLeft =  0.20;
+        powerRight = 0.35;
       }
-      else {
+      else if(position <= 48) {
+        // Continue forwards
+        powerLeft = powerRight = 0.25;
+      }
+      else if(position < 128) {
         // Turn right
         powerLeft = 0.35;
-        powerRight = -0.35;
+        powerRight = 0.20;
       }
+      else {
+        // Turn sharp right
+        powerLeft = 0.35;
+        powerRight = 0.00;
+      }
+
+      //std::cout << "Sensor result ";
+
+
+      //std::cout << " = " << position ;
+
+      //std::cout << std::endl;
 
       // Set the motors
       if(lastPowerLeft != powerLeft || lastPowerRight != powerRight) {
@@ -93,7 +116,7 @@ void ThoughtProcess_LineFollower::run(std::atomic<bool> &running) {
     }
     
     // Let the robot actually move
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    //std::this_thread::sleep_for (std::chrono::milliseconds(10));
     
   }
 

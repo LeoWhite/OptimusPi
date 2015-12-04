@@ -33,7 +33,7 @@ bool SensorQTR8RC::enable() {
       std::cout << "Calibration started" << std::endl;
 
       // Allow 5 seconds for calibration
-      std::this_thread::sleep_for (std::chrono::seconds(5));
+      //std::this_thread::sleep_for (std::chrono::seconds(5));
 
       if(writeByte('\x12')) {
         std::cout << "Calibration complete" << std::endl;
@@ -64,7 +64,7 @@ bool SensorQTR8RC::readLine(uint16_t (&sensorDiff)[8], uint16_t &position) {
     size_t read, i2cResponseArg = 0;
 
     // Allow the Arduino time to take a reading
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(5));
 
     // and read in the results
     read = readBytes(i2cResponse, 19);
