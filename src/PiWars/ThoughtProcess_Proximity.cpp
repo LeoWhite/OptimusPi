@@ -57,7 +57,7 @@ void ThoughtProcess_Proximity::run(std::atomic<bool> &running) {
     std::cout << "Range = "<< (int) range << std::endl;
 
     // Time to stop? (It takes some distance to stop)
-    if(range <= 66) {
+    if(range <= 70) {
       // Stop!
       power = 0.0;
 
